@@ -35,7 +35,7 @@ public class CategoryController {
         List<CategoryDto> categoryDtoList = MapperUtil.convertList(categoryList, this::convertToCategoryDto);
 
         log.info("Response for GET request /categories with data {}", categoryDtoList);
-        for(CategoryDto categoryDto: categoryDtoList) {
+        for (CategoryDto categoryDto : categoryDtoList) {
             log.info("{}, {}", categoryDto.getId(), categoryDto.getName());
         }
 
@@ -72,7 +72,7 @@ public class CategoryController {
             @RequestBody List<CategoryDto> categoryDtoList) {
 
         log.info("POST request /categories/import with data {}", categoryDtoList);
-        for(CategoryDto categoryDto: categoryDtoList) {
+        for (CategoryDto categoryDto : categoryDtoList) {
             log.info("{}", categoryDto.getName());
         }
 
@@ -82,7 +82,7 @@ public class CategoryController {
                 createdCategoryList, this::convertToCategoryDto);
 
         log.info("Response for POST request /categories/import with data {}", createdCategoryDtoList);
-        for(CategoryDto categoryDto: categoryDtoList) {
+        for (CategoryDto categoryDto : categoryDtoList) {
             log.info("{}, {}", categoryDto.getId(), categoryDto.getName());
         }
 

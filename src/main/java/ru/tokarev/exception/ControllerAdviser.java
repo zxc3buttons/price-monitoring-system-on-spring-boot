@@ -1,6 +1,7 @@
 package ru.tokarev.exception;
 
 import org.modelmapper.MappingException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -104,6 +105,24 @@ public class ControllerAdviser extends ResponseEntityExceptionHandler {
 
         return buildApiErrorDto(HttpStatus.BAD_REQUEST.value(), "Bad request", errors,
                 (ServletWebRequest) request);
+    }
+
+    @ExceptionHandler({DataIntegrityViolationException.class})
+    protected ResponseEntity<Object> handlePersistenceException(final Exception ex, final WebRequest request) {
+
+        Throwable cause = ((DataIntegrityViolationException) ex).getRootCause();
+        if (cause instanceof org.postgresql.util.PSQLException) {
+
+            org.postgresql.util.PSQLException consEx =
+                    (org.postgresql.util.PSQLException) cause;
+            final List<String> errors = new ArrayList<>();
+            errors.add(consEx.getMessage());
+
+            return buildApiErrorDto(HttpStatus.BAD_REQUEST.value(), "Bad request", errors,
+                    (ServletWebRequest) request);
+        }
+        return buildApiErrorDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error",
+                List.of("Error occurred"), (ServletWebRequest) request);
     }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})

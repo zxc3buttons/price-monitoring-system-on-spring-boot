@@ -39,7 +39,7 @@ public class UserController {
         List<UserDto> userDtoList = MapperUtil.convertList(userList, this::convertToUserDto);
 
         log.info("Response for GET request for /users with data {}", userDtoList);
-        for(UserDto userDto : userDtoList) {
+        for (UserDto userDto : userDtoList) {
             log.info("id {}, username {}, firstName {}, lastName {}, email {}, password {}, roleId {}",
                     userDto.getId(), userDto.getUsername(), userDto.getFirstName(), userDto.getLastName(),
                     userDto.getEmail(), userDto.getPassword(), userDto.getRoleDto().getId());
@@ -57,7 +57,7 @@ public class UserController {
         UserDto userDto = convertToUserDto(user);
 
         log.info("Response for GET request for /users/{} with data:" +
-                " id {}, username {}, firstName {}, lastName {}, email {}, password {}, roleId {}", id,
+                        " id {}, username {}, firstName {}, lastName {}, email {}, password {}, roleId {}", id,
                 userDto.getId(), userDto.getUsername(), userDto.getFirstName(), userDto.getLastName(),
                 userDto.getEmail(), userDto.getPassword(), userDto.getRoleDto().getId());
 
@@ -68,7 +68,7 @@ public class UserController {
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
 
         log.info("PATCH request for /users/{} with data:" +
-                " username {}, firstName {}, lastName {}, email {}, password {}, roleId {}", id,
+                        " username {}, firstName {}, lastName {}, email {}, password {}, roleId {}", id,
                 userDto.getUsername(), userDto.getFirstName(), userDto.getLastName(),
                 userDto.getEmail(), userDto.getPassword(), userDto.getRoleDto().getId());
 
@@ -77,7 +77,7 @@ public class UserController {
         UserDto updatedUserDto = convertToUserDto(updatedUser);
 
         log.info("Response for PATCH request for /users/{} with data:" +
-                " id {}, username {}, firstName {}, lastName {}, email {}, password {}, roleId {}", id,
+                        " id {}, username {}, firstName {}, lastName {}, email {}, password {}, roleId {}", id,
                 updatedUserDto.getId(), updatedUserDto.getUsername(), updatedUserDto.getFirstName(),
                 updatedUserDto.getLastName(), updatedUser.getEmail(), updatedUser.getPassword(),
                 updatedUserDto.getRoleDto().getId());
@@ -89,7 +89,7 @@ public class UserController {
     public ResponseEntity<UserDto> updateUserRole(@PathVariable Long id, @RequestBody UserDto userDto) {
 
         log.info("PATCH request for /users/{}/update_role with data:" +
-                " username {}, firstName {}, lastName {}, email {}, password {}, roleId {}", id,
+                        " username {}, firstName {}, lastName {}, email {}, password {}, roleId {}", id,
                 userDto.getUsername(), userDto.getFirstName(), userDto.getLastName(),
                 userDto.getEmail(), userDto.getPassword(), userDto.getRoleDto().getId());
 

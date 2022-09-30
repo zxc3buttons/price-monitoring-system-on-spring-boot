@@ -5,31 +5,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.tokarev.dao.categorydao.CategoryDao;
-import ru.tokarev.dao.productdao.ProductDao;
 import ru.tokarev.entity.Category;
 import ru.tokarev.entity.Product;
 import ru.tokarev.exception.categoryexception.CategoryNotFoundException;
 import ru.tokarev.exception.productexception.ProductBadRequestException;
 import ru.tokarev.exception.productexception.ProductExistsException;
 import ru.tokarev.exception.productexception.ProductNotFoundException;
+import ru.tokarev.repository.CategoryRepository;
+import ru.tokarev.repository.ProductRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private ProductDao<Product> productDao;
+    private final ProductRepository productRepository;
 
-    private CategoryDao<Category> categoryDao;
+    private final CategoryRepository categoryRepository;
 
     @Autowired
-    public void setMarketPlaceDao(ProductDao<Product> productDao, CategoryDao<Category> categoryDao) {
-        this.productDao = productDao;
-        this.productDao.setClazz(Product.class);
-        this.categoryDao = categoryDao;
-        this.categoryDao.setClazz(Category.class);
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository) {
+        this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -37,7 +36,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public Product getById(Long id) {
 
-        Product product = productDao.findById(id).orElseThrow(
+        Product product = productRepository.findById(id).orElseThrow(
                 () -> new ProductNotFoundException("Product with this id not found")
         );
 
@@ -53,7 +52,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (categoryName == null) {
 
-            List<Product> productList = productDao.findAll().orElseThrow(
+            List<Product> productList = Optional.of(productRepository.findAll()).orElseThrow(
                     () -> new ProductNotFoundException("Products not found")
             );
 
@@ -68,11 +67,11 @@ public class ProductServiceImpl implements ProductService {
             return productList;
 
         } else {
-            Category category = categoryDao.findByName(categoryName).orElseThrow(
+            Category category = categoryRepository.findByName(categoryName).orElseThrow(
                     () -> new CategoryNotFoundException("Category doesn't exist")
             );
 
-            List<Product> productList = productDao.findAllByCategory(category).orElseThrow(
+            List<Product> productList = productRepository.findAllByCategory(category).orElseThrow(
                     () -> new ProductNotFoundException("Products not found")
             );
 
@@ -92,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     @Transactional
     public Product createProduct(Product product) {
-        if (productDao.findByName(product.getName()).isPresent()) {
+        if (productRepository.findByName(product.getName()).isPresent()) {
             throw new ProductExistsException("Product with this name already exists");
         } else if (product.getCategory() == null) {
             throw new ProductBadRequestException("Category shouldn't be empty");
@@ -103,19 +102,19 @@ public class ProductServiceImpl implements ProductService {
         } else if (product.getCategory().getId() == null && product.getCategory().getName() == null) {
             throw new ProductBadRequestException("Category fields shouldn't be empty");
         } else if (product.getCategory().getId() != null) {
-            Category category = categoryDao.findById(product.getCategory().getId()).orElseThrow(
+            Category category = categoryRepository.findById(product.getCategory().getId()).orElseThrow(
                     () -> new CategoryNotFoundException("Category with this id doesn't exist")
             );
             product.setCategory(category);
-            return productDao.create(product).orElseThrow(
+            return Optional.of(productRepository.save(product)).orElseThrow(
                     () -> new ProductBadRequestException("Bad request")
             );
         } else {
-            Category category = categoryDao.findByName(product.getCategory().getName()).orElseThrow(
+            Category category = categoryRepository.findByName(product.getCategory().getName()).orElseThrow(
                     () -> new CategoryNotFoundException("Category with this name doesn't exist")
             );
             product.setCategory(category);
-            return productDao.create(product).orElseThrow(
+            return Optional.of(productRepository.save(product)).orElseThrow(
                     () -> new ProductBadRequestException("Bad request")
             );
         }
@@ -140,10 +139,10 @@ public class ProductServiceImpl implements ProductService {
     public Product updateProduct(Long id, Product product) {
 
         Category category;
-        Product existingProduct = productDao.findById(id).orElseThrow(
+        Product existingProduct = productRepository.findById(id).orElseThrow(
                 () -> new ProductNotFoundException("Product with this id not found"));
 
-        if (productDao.findByName(product.getName()).isPresent()) {
+        if (productRepository.findByName(product.getName()).isPresent()) {
             throw new ProductExistsException("Product with this name already exists");
         }
         if (product.getName().isEmpty() || product.getName() == null) {
@@ -153,12 +152,12 @@ public class ProductServiceImpl implements ProductService {
         } else if (product.getCategory().getId() == null && product.getCategory().getName() == null) {
             throw new ProductBadRequestException("Category fields shouldn't be empty");
         } else if (product.getCategory().getId() != null) {
-            category = categoryDao.findById(product.getCategory().getId()).orElseThrow(
+            category = categoryRepository.findById(product.getCategory().getId()).orElseThrow(
                     () -> new CategoryNotFoundException("Category with this id doesn't exist")
             );
             existingProduct.setCategory(category);
         } else {
-            category = categoryDao.findByName(product.getCategory().getName()).orElseThrow(
+            category = categoryRepository.findByName(product.getCategory().getName()).orElseThrow(
                     () -> new CategoryNotFoundException("Category with this name doesn't exist")
             );
             existingProduct.setCategory(category);
@@ -166,7 +165,7 @@ public class ProductServiceImpl implements ProductService {
 
         existingProduct.setName(product.getName());
 
-        return productDao.update(existingProduct).orElseThrow(
+        return Optional.of(productRepository.save(product)).orElseThrow(
                 () -> new ProductBadRequestException("Bad request"));
     }
 
@@ -175,10 +174,10 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void deleteProduct(Long id) {
 
-        Product product = productDao.findById(id).orElseThrow(
+        Product product = productRepository.findById(id).orElseThrow(
                 () -> new ProductNotFoundException("Product with this id not found")
         );
 
-        productDao.deleteById(product.getId());
+        productRepository.deleteById(product.getId());
     }
 }

@@ -6,10 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.tokarev.dao.roledao.RoleDao;
-import ru.tokarev.dao.userdao.UserDao;
 import ru.tokarev.entity.Role;
 import ru.tokarev.entity.User;
+import ru.tokarev.repository.RoleRepository;
+import ru.tokarev.repository.UserRepository;
 
 import java.util.Date;
 import java.util.List;
@@ -26,10 +26,10 @@ import static org.mockito.Mockito.verify;
 class UserServiceTest {
 
     @Mock
-    private UserDao<User> userDao;
+    private UserRepository userRepository;
 
     @Mock
-    private RoleDao<Role> roleDao;
+    private RoleRepository roleRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -43,7 +43,7 @@ class UserServiceTest {
         User createdUser = new User(1L, "oleg", "Oleg",
                 "Tokarev", "oleg@mail.ru", "12345qwert",
                 new Role(1L, "ADMIN"), new Date(), new Date());
-        given(userDao.findById(1L)).willReturn(Optional.of(createdUser));
+        given(userRepository.findById(1L)).willReturn(Optional.of(createdUser));
 
         //act
         User user = userService.getById(1L);
@@ -61,7 +61,7 @@ class UserServiceTest {
         User createdUser2 = new User(2L, "misha", "Misha",
                 "Alikov", "misha@mail.ru", "123qwe",
                 new Role(2L, "USER"), new Date(), new Date());
-        given(userDao.findAll()).willReturn(Optional.of(List.of(createdUser1, createdUser2)));
+        given(userRepository.findAll()).willReturn(List.of(createdUser1, createdUser2));
 
         //act
         List<User> userList = userService.getAll();
@@ -78,7 +78,7 @@ class UserServiceTest {
                 "oleg@mail.ru", passwordEncoder.encode("1234qwer"), new Role(3L,
                 "ROLE_UNDEFINED"),
                 new Date(), new Date());
-        given(userDao.create(userToCreate)).willReturn(Optional.of(userToCreate));
+        given(userRepository.save(userToCreate)).willReturn(userToCreate);
 
         //act
         User user = userService.createUser(userToCreate);
@@ -98,8 +98,8 @@ class UserServiceTest {
         User updUser = new User(1L, "olegqwe", "Oleg", "Tokarev",
                 "oleg@mail.ru", passwordEncoder.encode("1234qwer"), new Role(3L, "UNDEFINED"),
                 new Date(), new Date());
-        given(userDao.findById(1L)).willReturn(Optional.of(existingUser));
-        given(userDao.update(existingUser)).willReturn(Optional.of(updUser));
+        given(userRepository.findById(1L)).willReturn(Optional.of(existingUser));
+        given(userRepository.save(existingUser)).willReturn(updUser);
 
         //act
         User user = userService.updateUser(1L, existingUser);
@@ -118,9 +118,9 @@ class UserServiceTest {
                 "oleg@mail.ru", passwordEncoder.encode("1234qwer"), role,
                 new Date(), new Date());
 
-        given(userDao.findById(1L)).willReturn(Optional.of(existingUser));
-        given(roleDao.findById(2L)).willReturn(Optional.of(role));
-        given(userDao.update(existingUser)).willReturn(Optional.of(existingUser));
+        given(userRepository.findById(1L)).willReturn(Optional.of(existingUser));
+        given(roleRepository.findById(2L)).willReturn(Optional.of(role));
+        given(userRepository.save(existingUser)).willReturn(existingUser);
 
         //act
         User user = userService.updateUserRole(1L, existingUser);
@@ -136,13 +136,13 @@ class UserServiceTest {
         User existingUser = new User(1L, "oleg", "Oleg",
                 "Tokarev", "oleg@mail.ru", "12345qwert",
                 new Role(1L, "ADMIN"), new Date(), new Date());
-        given(userDao.findById(1L)).willReturn(Optional.of(existingUser));
-        willDoNothing().given(userDao).deleteById(1L);
+        given(userRepository.findById(1L)).willReturn(Optional.of(existingUser));
+        willDoNothing().given(userRepository).deleteById(1L);
 
         //act
         userService.deleteUser(1L);
 
         //assert
-        verify(userDao, times(1)).deleteById(1L);
+        verify(userRepository, times(1)).deleteById(1L);
     }
 }

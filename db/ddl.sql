@@ -5,7 +5,8 @@ OWNER = postgres
 ENCODING = 'UTF8'
 CONNECTION LIMIT = -1;
 
-\c price_monitoring_system;
+\c
+price_monitoring_system;
 
 create sequence user_id_seq start with 100 increment by 1;
 create sequence role_id_seq start with 100 increment by 1;

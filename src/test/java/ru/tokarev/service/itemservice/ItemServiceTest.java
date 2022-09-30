@@ -5,9 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.tokarev.dao.marketplacedao.MarketPlaceDao;
-import ru.tokarev.dao.productdao.ProductDao;
-import ru.tokarev.dao.productonmarket.ItemDao;
 import ru.tokarev.dto.item.PriceByDayDto;
 import ru.tokarev.dto.item.ProductPriceComparingDto;
 import ru.tokarev.dto.item.ProductPriceDifferenceDto;
@@ -15,6 +12,9 @@ import ru.tokarev.entity.Category;
 import ru.tokarev.entity.Marketplace;
 import ru.tokarev.entity.Product;
 import ru.tokarev.entity.item.Item;
+import ru.tokarev.repository.ItemRepository;
+import ru.tokarev.repository.MarketplaceRepository;
+import ru.tokarev.repository.ProductRepository;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -33,13 +33,13 @@ import static org.mockito.Mockito.verify;
 class ItemServiceTest {
 
     @Mock
-    private ItemDao<Item> itemDao;
+    private ItemRepository itemRepository;
 
     @Mock
-    private ProductDao<Product> productDao;
+    private ProductRepository productRepository;
 
     @Mock
-    private MarketPlaceDao<Marketplace> marketplaceDao;
+    private MarketplaceRepository marketplaceRepository;
 
     @InjectMocks
     private ItemServiceImpl itemService;
@@ -53,10 +53,10 @@ class ItemServiceTest {
         Item existingItem = new Item(1L, 100, LocalDate.now(),
                 LocalDate.now().plusDays(1), product, marketplace);
 
-        given(itemDao.findBySerialNumber(1L)).willReturn(Optional.of(existingItem));
+        given(itemRepository.findById(1L)).willReturn(Optional.of(existingItem));
 
         //act
-        Item item = itemService.getBySerialNumber(1L);
+        Item item = itemService.getById(1L);
 
         //assert
         assertEquals(item, existingItem);
@@ -75,8 +75,7 @@ class ItemServiceTest {
         Item existingItem2 = new Item(1L, 80, LocalDate.now(),
                 LocalDate.now().plusDays(1), product2, marketplace);
 
-        given(itemDao.findAll()).willReturn(
-                Optional.of(List.of(existingItem1, existingItem2)));
+        given(itemRepository.findAll()).willReturn(List.of(existingItem1, existingItem2));
 
         //act
         List<Item> itemList = itemService.getAll();
@@ -114,9 +113,9 @@ class ItemServiceTest {
         ProductPriceDifferenceDto createdProductPriceDifferenceDto = new ProductPriceDifferenceDto(product.getName(),
                 marketplace.getName(), priceByDayDtoList);
 
-        given(productDao.findById(1L)).willReturn(Optional.of(product));
-        given(marketplaceDao.findById(1L)).willReturn(Optional.of(marketplace));
-        given(itemDao.findAllByProductAndMarketplace(product, marketplace)).willReturn(
+        given(productRepository.findById(1L)).willReturn(Optional.of(product));
+        given(marketplaceRepository.findById(1L)).willReturn(Optional.of(marketplace));
+        given(itemRepository.findAllByProductAndMarketplaceAndOrderByDateStartAsc(product, marketplace)).willReturn(
                 Optional.of(List.of(existingItem1, existingItem2)));
 
         //act
@@ -169,12 +168,12 @@ class ItemServiceTest {
                 createdProductPriceDifferenceDto1, createdProductPriceDifferenceDto2
         );
 
-        given(productDao.findById(1L)).willReturn(Optional.of(product));
-        given(marketplaceDao.findAll()).willReturn(Optional.of(List.of(marketplace1, marketplace2)));
+        given(productRepository.findById(1L)).willReturn(Optional.of(product));
+        given(marketplaceRepository.findAll()).willReturn(List.of(marketplace1, marketplace2));
 
-        given(itemDao.findAllByProductAndMarketplace(product, marketplace1)).willReturn(
+        given(itemRepository.findAllByProductAndMarketplaceAndOrderByDateStartAsc(product, marketplace1)).willReturn(
                 Optional.of(List.of(existingItem1)));
-        given(itemDao.findAllByProductAndMarketplace(product, marketplace2)).willReturn(
+        given(itemRepository.findAllByProductAndMarketplaceAndOrderByDateStartAsc(product, marketplace2)).willReturn(
                 Optional.of(List.of(existingItem2)));
 
         //act
@@ -218,8 +217,9 @@ class ItemServiceTest {
         ProductPriceComparingDto createdProductPriceComparingDto = new ProductPriceComparingDto(product.getName(),
                 marketplaceEverydayPricesMap);
 
-        given(productDao.findById(1L)).willReturn(Optional.of(product));
-        given(itemDao.findProductsOnMarketByDateAndProduct(product, dateStart, dateEnd)).willReturn(
+        given(productRepository.findById(1L)).willReturn(Optional.of(product));
+        given(itemRepository.findAllByDateStartAfterAndDateEndBeforeAndProductOrderByDateStartAsc(
+                dateStart, dateEnd, product)).willReturn(
                 Optional.of(List.of(existingItem1, existingItem2))
         );
 
@@ -251,10 +251,11 @@ class ItemServiceTest {
         Item item1 = new Item(null, 100, dateStart1, dateEnd1, product, marketplace);
         Item item2 = new Item(1L, 100, dateStart2, dateEnd2, product, marketplace);
 
-        given(itemDao.findAllByProductAndMarketplace(product, marketplace)).willReturn(Optional.of(List.of(item2)));
-        given(productDao.findById(product.getId())).willReturn(Optional.of(product));
-        given(marketplaceDao.findById(marketplace.getId())).willReturn(Optional.of(marketplace));
-        given(itemDao.create(item1)).willReturn(Optional.of(item1));
+        given(itemRepository.findAllByProductAndMarketplaceAndOrderByDateStartAsc(product, marketplace))
+                .willReturn(Optional.of(List.of(item2)));
+        given(productRepository.findById(product.getId())).willReturn(Optional.of(product));
+        given(marketplaceRepository.findById(marketplace.getId())).willReturn(Optional.of(marketplace));
+        given(itemRepository.save(item1)).willReturn(item1);
 
         //act
         Item actualItem = itemService.createItem(item1);
@@ -283,15 +284,17 @@ class ItemServiceTest {
         Item item2 = new Item(2L, 100, dateStart2, dateEnd2, product, marketplace);
         Item item3 = new Item(3L, 100, dateStart3, dateEnd3, product, marketplace);
 
-        given(itemDao.findAllByProductAndMarketplace(product, marketplace)).willReturn(Optional.of(List.of(item3)));
-        given(productDao.findById(product.getId())).willReturn(Optional.of(product));
-        given(marketplaceDao.findById(marketplace.getId())).willReturn(Optional.of(marketplace));
-        given(itemDao.create(item1)).willReturn(Optional.of(item1));
+        given(itemRepository.findAllByProductAndMarketplaceAndOrderByDateStartAsc(product, marketplace)).
+                willReturn(Optional.of(List.of(item3)));
+        given(productRepository.findById(product.getId())).willReturn(Optional.of(product));
+        given(marketplaceRepository.findById(marketplace.getId())).willReturn(Optional.of(marketplace));
+        given(itemRepository.save(item1)).willReturn(item1);
 
-        given(itemDao.findAllByProductAndMarketplace(product, marketplace)).willReturn(Optional.of(List.of(item3)));
-        given(productDao.findById(product.getId())).willReturn(Optional.of(product));
-        given(marketplaceDao.findById(marketplace.getId())).willReturn(Optional.of(marketplace));
-        given(itemDao.create(item2)).willReturn(Optional.of(item2));
+        given(itemRepository.findAllByProductAndMarketplaceAndOrderByDateStartAsc(product, marketplace)).
+                willReturn(Optional.of(List.of(item3)));
+        given(productRepository.findById(product.getId())).willReturn(Optional.of(product));
+        given(marketplaceRepository.findById(marketplace.getId())).willReturn(Optional.of(marketplace));
+        given(itemRepository.save(item2)).willReturn(item2);
 
         //act
         List<Item> actualItems = itemService.createItems(List.of(item1, item2));
@@ -313,13 +316,13 @@ class ItemServiceTest {
         LocalDate dateEnd = LocalDate.now().minusDays(1);
 
         Item existingItem = new Item(1L, 100, dateStart, dateEnd, product, marketplace);
-        given(itemDao.findBySerialNumber(1L)).willReturn(Optional.of(existingItem));
-        willDoNothing().given(itemDao).deleteBySerialNumber(1L);
+        given(itemRepository.findById(1L)).willReturn(Optional.of(existingItem));
+        willDoNothing().given(itemRepository).deleteById(1L);
 
         //act
         itemService.deleteItem(1L);
 
         //assert
-        verify(itemDao, times(1)).deleteBySerialNumber(1L);
+        verify(itemRepository, times(1)).deleteById(1L);
     }
 }

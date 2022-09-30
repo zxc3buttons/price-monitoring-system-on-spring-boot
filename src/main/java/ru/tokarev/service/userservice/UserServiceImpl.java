@@ -6,53 +6,56 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.tokarev.dao.roledao.RoleDao;
-import ru.tokarev.dao.userdao.UserDao;
 import ru.tokarev.entity.Role;
 import ru.tokarev.entity.User;
-import ru.tokarev.exception.roleexception.RoleNotFoundException;
 import ru.tokarev.exception.userexception.UserBadRequestException;
 import ru.tokarev.exception.userexception.UserExistsException;
 import ru.tokarev.exception.userexception.UserNotFoundException;
+import ru.tokarev.repository.RoleRepository;
+import ru.tokarev.repository.UserRepository;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserDao<User> userDao;
+    private final UserRepository userRepository;
 
-    private RoleDao<Role> roleDao;
+    private final RoleRepository roleRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final Validator validator;
 
     private final Long ROLE_UNDEFINED = 103L;
 
     @Autowired
-    public void setDao(UserDao<User> userDao, RoleDao<Role> roleDao) {
-        this.userDao = userDao;
-        this.userDao.setClazz(User.class);
-        this.roleDao = roleDao;
-        this.roleDao.setClazz(Role.class);
-    }
-
-    @Autowired
-    public UserServiceImpl(PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
+                           PasswordEncoder passwordEncoder, Validator validator) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.validator = validator;
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public User getById(Long id) {
-        return userDao.findById(id).orElseThrow(() -> new UserNotFoundException("User with this id not found"));
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with this id not found"));
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<User> getAll() {
 
-        List<User> userList = userDao.findAll().orElseThrow(() -> new UserNotFoundException("Users not found"));
+        List<User> userList = Optional.of(userRepository.findAll()).orElseThrow(
+                () -> new UserNotFoundException("Users not found"));
 
         if (userList.size() == 0) {
             throw new UsernameNotFoundException("Users not found");
@@ -65,11 +68,17 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User createUser(User user) {
 
-        if (existsByUsername(user.getUsername())) {
-            throw new UserExistsException("Username already exists");
-        } else if (existsByEmail(user.getEmail())) {
-            throw new UserExistsException("Email already exists");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<User> constraintViolation : violations) {
+                sb.append(constraintViolation.getMessage());
+            }
+            throw new ConstraintViolationException("Error occurred: " + sb, violations);
         }
+
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         Role role = new Role();
@@ -79,7 +88,7 @@ public class UserServiceImpl implements UserService {
 
         user.setCreated(new Date());
         user.setUpdated(new Date());
-        return userDao.create(user).orElseThrow(() -> new UserBadRequestException("Bad request"));
+        return Optional.of(userRepository.save(user)).orElseThrow(() -> new UserBadRequestException("Bad request"));
     }
 
     @Override
@@ -87,7 +96,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User updateUser(Long id, User user) {
 
-        User existingUser = userDao.findById(id).orElseThrow(
+        User existingUser = userRepository.findById(id).orElseThrow(
                 () -> new UsernameNotFoundException("User with this id not found"));
 
         if (user.getUsername() != null && !user.getUsername().isEmpty()) {
@@ -118,29 +127,31 @@ public class UserServiceImpl implements UserService {
 
         existingUser.setUpdated(new Date());
 
-        return userDao.update(existingUser).orElseThrow(() -> new UserBadRequestException("Bad request"));
+        return Optional.of(userRepository.save(existingUser)).orElseThrow(
+                () -> new UserBadRequestException("Bad request"));
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Transactional
     public User updateUserRole(Long id, User user) {
-        User existingUser = userDao.findById(id).orElseThrow(
+        User existingUser = userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("User with this id not found"));
 
         if (user.getRole() == null) {
             throw new UserBadRequestException("Role field shouldn't be empty");
         } else if (user.getRole().getId() == null) {
             throw new UserBadRequestException("Role id field shouldn't be empty");
-        } else if (roleDao.findById(user.getRole().getId()).isEmpty()) {
+        } else if (roleRepository.findById(user.getRole().getId()).isEmpty()) {
             throw new UserBadRequestException("Role with this id not found");
         }
-        Role role = roleDao.findById(user.getRole().getId()).orElseThrow(
+        Role role = roleRepository.findById(user.getRole().getId()).orElseThrow(
                 () -> new UserBadRequestException("Bad request"));
         existingUser.setRole(role);
         existingUser.setUpdated(new Date());
 
-        return userDao.update(existingUser).orElseThrow(() -> new UserBadRequestException("Bad request"));
+        return Optional.of(userRepository.save(existingUser)).orElseThrow(
+                () -> new UserBadRequestException("Bad request"));
     }
 
     @Override
@@ -148,18 +159,18 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long id) {
 
-        User user = userDao.findById(id).orElseThrow(
+        User user = userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("User with this id not found")
         );
 
-        userDao.deleteById(user.getId());
+        userRepository.deleteById(user.getId());
     }
 
     private boolean existsByUsername(String username) {
-        return userDao.findByUsername(username).isPresent();
+        return userRepository.findByUsername(username).isPresent();
     }
 
     private boolean existsByEmail(String email) {
-        return userDao.findByEmail(email).isPresent();
+        return userRepository.findByEmail(email).isPresent();
     }
 }

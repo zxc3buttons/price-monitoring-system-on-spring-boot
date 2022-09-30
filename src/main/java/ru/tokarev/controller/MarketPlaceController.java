@@ -37,7 +37,7 @@ public class MarketPlaceController {
                 convertList(marketplaceList, this::convertToMarketPlaceDto);
 
         log.info("Response for GET request /marketplaces with data {}", marketPlaceDtoList);
-        for(MarketPlaceDto marketPlaceDto : marketPlaceDtoList) {
+        for (MarketPlaceDto marketPlaceDto : marketPlaceDtoList) {
             log.info("id {}, name {}", marketPlaceDto.getId(), marketPlaceDto.getName());
         }
 
@@ -78,7 +78,7 @@ public class MarketPlaceController {
             @RequestBody List<MarketPlaceDto> marketPlaceDtoList) {
 
         log.info("POST request /marketplaces with data {}", marketPlaceDtoList);
-        for(MarketPlaceDto marketPlaceDto : marketPlaceDtoList) {
+        for (MarketPlaceDto marketPlaceDto : marketPlaceDtoList) {
             log.info("name {}", marketPlaceDto.getName());
         }
 
@@ -88,7 +88,7 @@ public class MarketPlaceController {
                 createdMarketplaceList, this::convertToMarketPlaceDto);
 
         log.info("Response for POST request /marketplaces with data {}", createdMarketplaceDtoList);
-        for(MarketPlaceDto marketPlaceDto : createdMarketplaceDtoList) {
+        for (MarketPlaceDto marketPlaceDto : createdMarketplaceDtoList) {
             log.info("id {}, name {}", marketPlaceDto.getId(), marketPlaceDto.getName());
         }
 

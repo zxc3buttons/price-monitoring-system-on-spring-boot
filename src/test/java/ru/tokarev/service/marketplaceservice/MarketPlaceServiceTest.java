@@ -5,8 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.tokarev.dao.marketplacedao.MarketPlaceDao;
 import ru.tokarev.entity.Marketplace;
+import ru.tokarev.repository.MarketplaceRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 class MarketPlaceServiceTest {
 
     @Mock
-    private MarketPlaceDao<Marketplace> marketPlaceDao;
+    private MarketplaceRepository marketplaceRepository;
 
     @InjectMocks
     private MarketPlaceServiceImpl marketPlaceService;
@@ -31,7 +31,7 @@ class MarketPlaceServiceTest {
 
         //arrange
         Marketplace existingMarketplace = new Marketplace(1L, "Perekrestok");
-        given(marketPlaceDao.findById(1L)).willReturn(Optional.of(existingMarketplace));
+        given(marketplaceRepository.findById(1L)).willReturn(Optional.of(existingMarketplace));
 
         //act
         Marketplace marketplace = marketPlaceService.getById(1L);
@@ -46,7 +46,7 @@ class MarketPlaceServiceTest {
         //arrange
         Marketplace existingMarketplace1 = new Marketplace(1L, "Perekrestok");
         Marketplace existingMarketplace2 = new Marketplace(2L, "Magnit");
-        given(marketPlaceDao.findAll()).willReturn(Optional.of(List.of(existingMarketplace1, existingMarketplace2)));
+        given(marketplaceRepository.findAll()).willReturn(List.of(existingMarketplace1, existingMarketplace2));
 
         //act
         List<Marketplace> marketplaceList = marketPlaceService.getAll();
@@ -61,7 +61,7 @@ class MarketPlaceServiceTest {
 
         //arrange
         Marketplace marketplaceToCreate = new Marketplace(1L, "Perekrestok");
-        given(marketPlaceDao.create(marketplaceToCreate)).willReturn(Optional.of(marketplaceToCreate));
+        given(marketplaceRepository.save(marketplaceToCreate)).willReturn(marketplaceToCreate);
 
         //act
         Marketplace marketplace = marketPlaceService.createMarketPlace(marketplaceToCreate);
@@ -76,8 +76,8 @@ class MarketPlaceServiceTest {
         //arrange
         Marketplace existingMarketplace = new Marketplace(1L, "Perekrestok");
         Marketplace updatedMarketplace = new Marketplace(1L, "Magnit");
-        given(marketPlaceDao.findById(1L)).willReturn(Optional.of(existingMarketplace));
-        given(marketPlaceDao.update(existingMarketplace)).willReturn(Optional.of(updatedMarketplace));
+        given(marketplaceRepository.findById(1L)).willReturn(Optional.of(existingMarketplace));
+        given(marketplaceRepository.save(existingMarketplace)).willReturn(updatedMarketplace);
 
         //act
         Marketplace marketplace = marketPlaceService.updateMarketPlace(1L, existingMarketplace);
@@ -90,13 +90,13 @@ class MarketPlaceServiceTest {
     void deleteMarketPlace() {
         //arrange
         Marketplace existingMarketplace = new Marketplace(1L, "Perekrestok");
-        given(marketPlaceDao.findById(1L)).willReturn(Optional.of(existingMarketplace));
-        willDoNothing().given(marketPlaceDao).deleteById(1L);
+        given(marketplaceRepository.findById(1L)).willReturn(Optional.of(existingMarketplace));
+        willDoNothing().given(marketplaceRepository).deleteById(1L);
 
         //act
         marketPlaceService.deleteMarketPlace(1L);
 
         //assert
-        verify(marketPlaceDao, times(1)).deleteById(1L);
+        verify(marketplaceRepository, times(1)).deleteById(1L);
     }
 }

@@ -40,7 +40,7 @@ public class ProductController {
         List<ProductDto> productDtoList = MapperUtil.convertList(productList, this::convertToProductDto);
 
         log.info("Response for GET request for /products with data {}", productDtoList);
-        for(ProductDto productDto : productDtoList) {
+        for (ProductDto productDto : productDtoList) {
             log.info("id {}, name {}, categoryId {}", productDto.getId(),
                     productDto.getName(), productDto.getCategoryDto().getId());
         }
@@ -82,7 +82,7 @@ public class ProductController {
     public ResponseEntity<List<ProductDto>> createProducts(@RequestBody List<ProductDto> productDtoList) {
 
         log.info("POST request for /products/import with data {}", productDtoList);
-        for(ProductDto productDto : productDtoList) {
+        for (ProductDto productDto : productDtoList) {
             log.info("name {}, categoryId {}", productDto.getName(), productDto.getCategoryDto().getId());
         }
 
@@ -91,7 +91,7 @@ public class ProductController {
         List<ProductDto> createdProductDtoList = MapperUtil.convertList(createdProductList, this::convertToProductDto);
 
         log.info("Response for POST request for /products/import with data {}", createdProductDtoList);
-        for(ProductDto productDto : createdProductDtoList) {
+        for (ProductDto productDto : createdProductDtoList) {
             log.info("id {}, name {}, categoryId {}",
                     productDto.getId(), productDto.getName(), productDto.getCategoryDto().getId());
         }

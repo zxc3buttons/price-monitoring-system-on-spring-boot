@@ -3,25 +3,21 @@ package ru.tokarev.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.orm.hibernate5.HibernateExceptionTranslator;
+
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 @Configuration
 @ComponentScan("ru.tokarev")
 public class SpringContextConfiguration {
-
-    private final ApplicationContext applicationContext;
-
-    @Autowired
-    public SpringContextConfiguration(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer properties() {
@@ -45,4 +41,16 @@ public class SpringContextConfiguration {
         mapper.registerModule(new JavaTimeModule());
         return mapper;
     }
+
+    @Bean
+    public Validator getValidator() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        return factory.getValidator();
+    }
+
+    @Bean
+    public HibernateExceptionTranslator getHibernateExceptionTranslator() {
+        return new HibernateExceptionTranslator();
+    }
+
 }

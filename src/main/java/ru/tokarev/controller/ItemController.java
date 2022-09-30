@@ -47,38 +47,38 @@ public class ItemController {
         log.info("Response for GET request for /items with data {}", itemDtoList);
         for (Item item : itemList) {
             log.info("serialNumber {}, productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}",
-                    item.getSerialNumber(), item.getProduct().getId(), item.getPrice(), item.getMarketplace().getId(),
+                    item.getId(), item.getProduct().getId(), item.getPrice(), item.getMarketplace().getId(),
                     item.getDateStart(), item.getDateEnd());
         }
 
         return new ResponseEntity<>(itemDtoList, HttpStatus.OK);
     }
 
-    @GetMapping("/{serial_number}")
-    public ResponseEntity<ItemDto> getBySerialNumber(
-            @PathVariable(value = "serial_number") Long serialNumber) {
+    @GetMapping("/{serial-number}")
+    public ResponseEntity<ItemDto> getById(
+            @PathVariable(value = "serial-number") Long serialNumber) {
 
         log.info("GET request for /items/{} with data {}", serialNumber, serialNumber);
 
-        Item item = itemService.getBySerialNumber(serialNumber);
+        Item item = itemService.getById(serialNumber);
         ItemDto itemDto = convertToItemDto(item);
 
         log.info("Response for GET request for /items/{} with itemDto:" +
-                " serialNumber {}, productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}", serialNumber,
-                item.getSerialNumber(), item.getProduct().getId(), item.getPrice(), item.getMarketplace().getId(),
+                        " serialNumber {}, productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}", serialNumber,
+                item.getId(), item.getProduct().getId(), item.getPrice(), item.getMarketplace().getId(),
                 item.getDateStart(), item.getDateEnd());
 
         return new ResponseEntity<>(itemDto, HttpStatus.OK);
     }
 
-    @GetMapping("/check_price_dynamic")
+    @GetMapping("/check-price-dynamic")
     public ResponseEntity<Object> getItemPriceDynamic(
             @RequestParam(name = "product_id") Long productId,
             @RequestParam(name = "date_start") String dateStart,
             @RequestParam(name = "date_end") String dateEnd,
             @RequestParam(name = "marketplace_id", required = false) Long marketplaceId) {
 
-        log.info("GET request for /check_price_dynamic with params: {}, {}, {}, {}",
+        log.info("GET request for /check-price-dynamic with params: {}, {}, {}, {}",
                 productId, dateStart, dateEnd, marketplaceId);
 
         LocalDate dateStartConverted = LocalDate.parse(dateStart);
@@ -98,8 +98,8 @@ public class ItemController {
                     productId, dateStartConverted, dateEndConverted);
         }
 
-        log.info("Response for GET request for /check_price_dynamic with data: {}", productPriceDifferenceDtos);
-        for(ProductPriceDifferenceDto productPriceDifferenceDto : productPriceDifferenceDtos) {
+        log.info("Response for GET request for /check-price-dynamic with data: {}", productPriceDifferenceDtos);
+        for (ProductPriceDifferenceDto productPriceDifferenceDto : productPriceDifferenceDtos) {
             log.info("productName {}, marketplaceName {}, priceByDayDtoList {}",
                     productPriceDifferenceDto.getProductName(), productPriceDifferenceDto.getMarketplaceName(),
                     productPriceDifferenceDto.getPriceByDayDtoList());
@@ -108,13 +108,13 @@ public class ItemController {
         return new ResponseEntity<>(productPriceDifferenceDtos, HttpStatus.OK);
     }
 
-    @GetMapping("/compare_prices")
+    @GetMapping("/compare-prices")
     public ResponseEntity<Object> getItemPriceComparing(
             @RequestParam(name = "product_id", required = false) Long productId,
             @RequestParam(name = "date_start") String dateStart,
             @RequestParam(name = "date_end") String dateEnd) {
 
-        log.info("GET request for /compare_prices with params: {}, {}, {}",
+        log.info("GET request for /compare-prices with params: {}, {}, {}",
                 productId, dateStart, dateEnd);
 
         LocalDate dateStartConverted = LocalDate.parse(dateStart);
@@ -130,8 +130,8 @@ public class ItemController {
                     productId, dateStartConverted, dateEndConverted));
         }
 
-        log.info("Response for GET request for /compare_prices with data: {}", productPriceComparingDtoList);
-        for(ProductPriceComparingDto productPriceComparingDto : productPriceComparingDtoList) {
+        log.info("Response for GET request for /compare-prices with data: {}", productPriceComparingDtoList);
+        for (ProductPriceComparingDto productPriceComparingDto : productPriceComparingDtoList) {
             log.info("productName {} and marketplacePriceMap {}", productPriceComparingDto.getProductName(),
                     productPriceComparingDto.getMarketplaceEverydayPricesMap());
         }
@@ -140,11 +140,10 @@ public class ItemController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ItemDto> createItem(
-            @RequestBody ItemDto itemDto) {
+    public ResponseEntity<ItemDto> createItem(@RequestBody ItemDto itemDto) {
 
         log.info("POST request for /items with data:" +
-                " productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}",
+                        " productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}",
                 itemDto.getProductForItemDto().getId(), itemDto.getPrice(), itemDto.getMarketPlaceDto().getId(),
                 itemDto.getDateStart(), itemDto.getDateEnd());
 
@@ -157,8 +156,8 @@ public class ItemController {
         ItemDto createdItemDto = convertToItemDto(createdItem);
 
         log.info("Response for POST request for /items with data:  " +
-                "serialNumber {}, productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}",
-                createdItemDto.getSerialNumber(),
+                        "serialNumber {}, productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}",
+                createdItemDto.getId(),
                 createdItemDto.getProductForItemDto().getId(), createdItemDto.getPrice(),
                 createdItemDto.getMarketPlaceDto().getId(),
                 createdItemDto.getDateStart(), createdItemDto.getDateEnd());
@@ -171,7 +170,7 @@ public class ItemController {
             @RequestBody List<ItemDto> itemDtoList) {
 
         log.info("POST request for /items/import with data {}", itemDtoList);
-        for(ItemDto itemDto: itemDtoList) {
+        for (ItemDto itemDto : itemDtoList) {
             log.info("productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}",
                     itemDto.getProductForItemDto().getId(), itemDto.getPrice(),
                     itemDto.getMarketPlaceDto().getId(), itemDto.getDateStart(), itemDto.getDateEnd());
@@ -191,17 +190,17 @@ public class ItemController {
                 MapperUtil.convertList(createdProductsOnMarketList, this::convertToItemDto);
 
         log.info("Response for POST request for /items/import with data {}", createdProductsOnMarketDtoList);
-        for(ItemDto itemDto: createdProductsOnMarketDtoList) {
+        for (ItemDto itemDto : createdProductsOnMarketDtoList) {
             log.info("serialNumber {}, productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}",
-                    itemDto.getSerialNumber(), itemDto.getProductForItemDto().getId(), itemDto.getPrice(),
+                    itemDto.getId(), itemDto.getProductForItemDto().getId(), itemDto.getPrice(),
                     itemDto.getMarketPlaceDto().getId(), itemDto.getDateStart(), itemDto.getDateEnd());
         }
 
         return new ResponseEntity<>(createdProductsOnMarketDtoList, HttpStatus.CREATED);
     }
 
-    @DeleteMapping(value = "/{serial_number}")
-    public ResponseEntity<String> deleteProductOnMarket(@PathVariable(value = "serial_number") Long serialNumber) {
+    @DeleteMapping(value = "/{serial-number}")
+    public ResponseEntity<String> deleteItem(@PathVariable(value = "serial-number") Long serialNumber) {
 
         log.info("DELETE request for /items/{} with data {}", serialNumber, serialNumber);
 

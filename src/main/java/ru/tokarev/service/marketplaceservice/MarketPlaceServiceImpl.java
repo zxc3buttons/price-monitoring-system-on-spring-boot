@@ -4,30 +4,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.tokarev.dao.marketplacedao.MarketPlaceDao;
 import ru.tokarev.entity.Marketplace;
 import ru.tokarev.exception.marketplaceexception.MarketPlaceBadRequestException;
 import ru.tokarev.exception.marketplaceexception.MarketPlaceExistsException;
 import ru.tokarev.exception.marketplaceexception.MarketPlaceNotFoundException;
+import ru.tokarev.repository.MarketplaceRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MarketPlaceServiceImpl implements MarketPlaceService {
 
-    private MarketPlaceDao<Marketplace> marketPlaceDao;
+    private final MarketplaceRepository marketplaceRepository;
 
     @Autowired
-    public void setMarketPlaceDao(MarketPlaceDao<Marketplace> marketPlaceDao) {
-        this.marketPlaceDao = marketPlaceDao;
-        this.marketPlaceDao.setClazz(Marketplace.class);
+    public MarketPlaceServiceImpl(MarketplaceRepository marketplaceRepository) {
+        this.marketplaceRepository = marketplaceRepository;
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public Marketplace getById(Long id) {
-        return marketPlaceDao.findById(id).orElseThrow(
+        return marketplaceRepository.findById(id).orElseThrow(
                 () -> new MarketPlaceNotFoundException("Marketplace with this id not found"));
     }
 
@@ -35,7 +35,7 @@ public class MarketPlaceServiceImpl implements MarketPlaceService {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public List<Marketplace> getAll() {
 
-        List<Marketplace> marketplaceList = marketPlaceDao.findAll().orElseThrow(
+        List<Marketplace> marketplaceList = Optional.of(marketplaceRepository.findAll()).orElseThrow(
                 () -> new MarketPlaceNotFoundException("Marketplaces not found"));
 
         if (marketplaceList.size() == 0) {
@@ -49,11 +49,12 @@ public class MarketPlaceServiceImpl implements MarketPlaceService {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Transactional
     public Marketplace createMarketPlace(Marketplace marketPlace) {
-        if (marketPlaceDao.findByName(marketPlace.getName()).isPresent()) {
+        if (marketplaceRepository.findByName(marketPlace.getName()).isPresent()) {
             throw new MarketPlaceExistsException("Marketplace with this name already exists");
         }
 
-        return marketPlaceDao.create(marketPlace).orElseThrow(MarketPlaceBadRequestException::new);
+        return Optional.of(marketplaceRepository.save(marketPlace))
+                .orElseThrow(MarketPlaceBadRequestException::new);
     }
 
     @Override
@@ -73,12 +74,12 @@ public class MarketPlaceServiceImpl implements MarketPlaceService {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Transactional
     public Marketplace updateMarketPlace(Long id, Marketplace marketPlace) {
-        Marketplace existingMarketplace = marketPlaceDao.findById(id).orElseThrow(
+        Marketplace existingMarketplace = marketplaceRepository.findById(id).orElseThrow(
                 () -> new MarketPlaceNotFoundException("Marketplace with this id not found")
         );
         existingMarketplace.setName(marketPlace.getName());
 
-        return marketPlaceDao.update(existingMarketplace).orElseThrow(MarketPlaceBadRequestException::new);
+        return Optional.of(marketplaceRepository.save(existingMarketplace)).orElseThrow(MarketPlaceBadRequestException::new);
     }
 
     @Override
@@ -86,10 +87,10 @@ public class MarketPlaceServiceImpl implements MarketPlaceService {
     @Transactional
     public void deleteMarketPlace(Long id) {
 
-        Marketplace marketplace = marketPlaceDao.findById(id).orElseThrow(
+        Marketplace marketplace = marketplaceRepository.findById(id).orElseThrow(
                 () -> new MarketPlaceNotFoundException("Marketplaces not found")
         );
 
-        marketPlaceDao.deleteById(marketplace.getId());
+        marketplaceRepository.deleteById(marketplace.getId());
     }
 }

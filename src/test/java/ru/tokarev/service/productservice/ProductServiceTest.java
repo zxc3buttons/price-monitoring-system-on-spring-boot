@@ -5,10 +5,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.tokarev.dao.categorydao.CategoryDao;
-import ru.tokarev.dao.productdao.ProductDao;
 import ru.tokarev.entity.Category;
 import ru.tokarev.entity.Product;
+import ru.tokarev.repository.CategoryRepository;
+import ru.tokarev.repository.ProductRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,10 +23,10 @@ import static org.mockito.Mockito.verify;
 class ProductServiceTest {
 
     @Mock
-    private ProductDao<Product> productDao;
+    private ProductRepository productRepository;
 
     @Mock
-    private CategoryDao<Category> categoryDao;
+    private CategoryRepository categoryRepository;
 
     @InjectMocks
     private ProductServiceImpl productService;
@@ -36,7 +36,7 @@ class ProductServiceTest {
 
         //arrange
         Product existingProduct = new Product(1L, "water", new Category(1L, "drinks"));
-        given(productDao.findById(1L)).willReturn(Optional.of(existingProduct));
+        given(productRepository.findById(1L)).willReturn(Optional.of(existingProduct));
 
         //act
         Product product = productService.getById(1L);
@@ -53,9 +53,9 @@ class ProductServiceTest {
         Product existingProduct1 = new Product(1L, "water", waterCategory);
         Product existingProduct2 = new Product(2L, "choco", new Category(2L, "sugar"));
 
-        given(productDao.findAll()).willReturn(Optional.of(List.of(existingProduct1, existingProduct2)));
-        given(categoryDao.findByName(waterCategory.getName())).willReturn(Optional.of(waterCategory));
-        given(productDao.findAllByCategory(waterCategory)).willReturn(Optional.of(List.of(existingProduct1)));
+        given(productRepository.findAll()).willReturn(List.of(existingProduct1, existingProduct2));
+        given(categoryRepository.findByName(waterCategory.getName())).willReturn(Optional.of(waterCategory));
+        given(productRepository.findAllByCategory(waterCategory)).willReturn(Optional.of(List.of(existingProduct1)));
 
         //act
         List<Product> productList = productService.getAll(null);
@@ -72,8 +72,8 @@ class ProductServiceTest {
         //arrange
         Category waterCategory = new Category(1L, "drinks");
         Product productToCreate = new Product(null, "water", waterCategory);
-        given(productDao.create(productToCreate)).willReturn(Optional.of(productToCreate));
-        given(categoryDao.findById(1L)).willReturn(Optional.of(waterCategory));
+        given(productRepository.save(productToCreate)).willReturn(productToCreate);
+        given(categoryRepository.findById(1L)).willReturn(Optional.of(waterCategory));
 
         //act
         Product product = productService.createProduct(productToCreate);
@@ -90,10 +90,10 @@ class ProductServiceTest {
         Product productToCreate1 = new Product(null, "water", waterCategory);
         Product productToCreate2 = new Product(null, "water", waterCategory);
 
-        given(productDao.create(productToCreate1)).willReturn(Optional.of(productToCreate1));
-        given(categoryDao.findById(1L)).willReturn(Optional.of(waterCategory));
-        given(productDao.create(productToCreate2)).willReturn(Optional.of(productToCreate2));
-        given(categoryDao.findById(1L)).willReturn(Optional.of(waterCategory));
+        given(productRepository.save(productToCreate1)).willReturn(productToCreate1);
+        given(categoryRepository.findById(1L)).willReturn(Optional.of(waterCategory));
+        given(productRepository.save(productToCreate2)).willReturn(productToCreate2);
+        given(categoryRepository.findById(1L)).willReturn(Optional.of(waterCategory));
 
         //act
         List<Product> productList = productService.createProducts(List.of(productToCreate1, productToCreate2));
@@ -110,9 +110,9 @@ class ProductServiceTest {
         Product existingProduct = new Product(1L, "water", waterCategory);
         Product updProduct = new Product(1L, "daughter", waterCategory);
 
-        given(productDao.findById(1L)).willReturn(Optional.of(existingProduct));
-        given(categoryDao.findById(1L)).willReturn(Optional.of(waterCategory));
-        given(productDao.update(existingProduct)).willReturn(Optional.of(updProduct));
+        given(productRepository.findById(1L)).willReturn(Optional.of(existingProduct));
+        given(categoryRepository.findById(1L)).willReturn(Optional.of(waterCategory));
+        given(productRepository.save(existingProduct)).willReturn(updProduct);
 
         //act
         Product product = productService.updateProduct(1L, existingProduct);
@@ -127,13 +127,13 @@ class ProductServiceTest {
         //arrange
         Category waterCategory = new Category(1L, "drinks");
         Product existingProduct = new Product(1L, "water", waterCategory);
-        given(productDao.findById(1L)).willReturn(Optional.of(existingProduct));
-        willDoNothing().given(productDao).deleteById(1L);
+        given(productRepository.findById(1L)).willReturn(Optional.of(existingProduct));
+        willDoNothing().given(productRepository).deleteById(1L);
 
         //act
         productService.deleteProduct(1L);
 
         //assert
-        verify(productDao, times(1)).deleteById(1L);
+        verify(productRepository, times(1)).deleteById(1L);
     }
 }

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ItemService {
 
-    Item getBySerialNumber(Long serialNumber);
+    Item getById(Long id);
 
     List<Item> getAll();
 

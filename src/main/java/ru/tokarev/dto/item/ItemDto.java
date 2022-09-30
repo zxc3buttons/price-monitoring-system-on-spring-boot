@@ -21,7 +21,7 @@ public class ItemDto {
 
     private Integer price;
 
-    private String serialNumber;
+    private Integer id;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateStart;

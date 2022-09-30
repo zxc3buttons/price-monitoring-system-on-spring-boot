@@ -43,7 +43,7 @@ public class RegistrationController {
         UserDto createdUserDto = convertToUserDto(createdUser);
 
         log.info("Response for POST request with data: id {}, username {}, firstName {}, lastName {}, email {}," +
-                " password {}, roleId {}", createdUserDto.getId(), createdUserDto.getUsername(),
+                        " password {}, roleId {}", createdUserDto.getId(), createdUserDto.getUsername(),
                 createdUserDto.getFirstName(), createdUserDto.getLastName(), createdUserDto.getEmail(),
                 createdUserDto.getPassword(), createdUserDto.getRoleDto().getId());
 

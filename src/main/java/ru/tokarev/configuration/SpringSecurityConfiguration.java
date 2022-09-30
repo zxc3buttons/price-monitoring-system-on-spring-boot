@@ -17,9 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import ru.tokarev.security.AuthEntryPoint;
 import ru.tokarev.security.jwt.AuthTokenFilter;
 import ru.tokarev.security.jwt.JwtUtils;
 
@@ -34,10 +32,6 @@ public class SpringSecurityConfiguration {
 
     private final UserDetailsService userDetailsService;
 
-    private final AuthEntryPoint unauthorizedHandler;
-
-    private final AccessDeniedHandler accessDeniedHandler;
-
     private final JwtUtils jwtUtils;
 
     @Value("${start_endpoint_prefix}")
@@ -50,11 +44,8 @@ public class SpringSecurityConfiguration {
     private String endpointLoginPrefix;
 
     @Autowired
-    public SpringSecurityConfiguration(UserDetailsService userDetailsService, AuthEntryPoint unauthorizedHandler,
-                                       AccessDeniedHandler accessDeniedHandler, JwtUtils jwtUtils) {
+    public SpringSecurityConfiguration(UserDetailsService userDetailsService, JwtUtils jwtUtils) {
         this.userDetailsService = userDetailsService;
-        this.unauthorizedHandler = unauthorizedHandler;
-        this.accessDeniedHandler = accessDeniedHandler;
         this.jwtUtils = jwtUtils;
     }
 
@@ -81,8 +72,8 @@ public class SpringSecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
-                .accessDeniedHandler(accessDeniedHandler).and()
+                .exceptionHandling()
+                .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .antMatcher(startEndpointPrefix)
                 .authorizeRequests()

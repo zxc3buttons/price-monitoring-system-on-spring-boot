@@ -156,7 +156,11 @@ public class ItemServiceImpl implements ItemService {
 
         List<ProductPriceComparingDto> productPriceComparingDtoList = new ArrayList<>();
         for (Product product : productList) {
-            productPriceComparingDtoList.add(getItemPriceComparing(product.getId(), dateStart, dateEnd));
+            ProductPriceComparingDto productPriceComparingDto =
+                    getItemPriceComparing(product.getId(), dateStart, dateEnd);
+            if(!productPriceComparingDto.getMarketplaceEverydayPricesMap().isEmpty()) {
+                productPriceComparingDtoList.add(getItemPriceComparing(product.getId(), dateStart, dateEnd));
+            }
         }
 
         return productPriceComparingDtoList;
@@ -286,7 +290,26 @@ public class ItemServiceImpl implements ItemService {
                     priceByDayDtoList.add(new PriceByDayDto(item.getPrice().toString(), date));
                 }
             }
+
         }
+
+        for (int i = 0; i < priceByDayDtoList.size(); i ++) {
+
+            if(i != priceByDayDtoList.size() - 1 && priceByDayDtoList.get(i).getDate().
+                    datesUntil(priceByDayDtoList.get(i + 1).getDate()).count() > 1) {
+
+                List<LocalDate> datesBetweenToItems = priceByDayDtoList.get(i).getDate().plusDays(1).
+                        datesUntil(priceByDayDtoList.get(i + 1).getDate()).collect(Collectors.toList());
+
+                for(LocalDate date : datesBetweenToItems) {
+                    priceByDayDtoList.add(new PriceByDayDto(priceByDayDtoList.get(i).getPrice(), date));
+                }
+
+                priceByDayDtoList.sort(Comparator.comparing(PriceByDayDto::getDate));
+
+            }
+        }
+
         return priceByDayDtoList;
     }
 }

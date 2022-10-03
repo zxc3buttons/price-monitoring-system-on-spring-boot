@@ -13,6 +13,7 @@ import ru.tokarev.dto.RoleDto;
 @AllArgsConstructor
 public class UserDto {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
     private String username;
@@ -25,6 +26,6 @@ public class UserDto {
 
     private String password;
 
-    @JsonProperty("role")
+    @JsonProperty(value = "role", access = JsonProperty.Access.READ_ONLY)
     private RoleDto roleDto;
 }

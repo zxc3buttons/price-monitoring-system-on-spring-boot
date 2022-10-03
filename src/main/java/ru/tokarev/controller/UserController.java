@@ -1,5 +1,9 @@
 package ru.tokarev.controller;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,9 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.tokarev.dto.ApiErrorDto;
 import ru.tokarev.dto.RoleDto;
+import ru.tokarev.dto.userdto.LoginResponseDto;
 import ru.tokarev.dto.userdto.UserDto;
 import ru.tokarev.entity.User;
+import ru.tokarev.exception.categoryexception.CategoryNotFoundException;
 import ru.tokarev.service.userservice.UserService;
 import ru.tokarev.utils.MapperUtil;
 
@@ -31,6 +38,14 @@ public class UserController {
     }
 
     @GetMapping
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     public ResponseEntity<List<UserDto>> getAll() {
 
         log.info("GET request for /users with no data");
@@ -49,6 +64,14 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     public ResponseEntity<UserDto> getById(@PathVariable Long id) {
 
         log.info("GET request for /users/{} with data {}", id, id);
@@ -64,6 +87,16 @@ public class UserController {
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "401", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
 
@@ -85,6 +118,16 @@ public class UserController {
         return new ResponseEntity<>(updatedUserDto, HttpStatus.OK);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "401", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     @PatchMapping(value = "/{id}/update-role", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDto> updateUserRole(@PathVariable Long id, @RequestBody UserDto userDto) {
 
@@ -106,6 +149,14 @@ public class UserController {
         return new ResponseEntity<>(updatedUserDto, HttpStatus.OK);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+    })
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
 

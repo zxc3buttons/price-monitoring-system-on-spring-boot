@@ -1,5 +1,9 @@
 package ru.tokarev.controller;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.tokarev.dto.ApiErrorDto;
 import ru.tokarev.dto.CategoryDto;
+import ru.tokarev.dto.userdto.LoginResponseDto;
 import ru.tokarev.entity.Category;
+import ru.tokarev.exception.categoryexception.CategoryNotFoundException;
 import ru.tokarev.service.categoryservice.CategoryService;
 import ru.tokarev.utils.MapperUtil;
 
@@ -30,6 +37,14 @@ public class CategoryController {
     }
 
     @GetMapping
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = CategoryDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     public ResponseEntity<List<CategoryDto>> getAll() {
         List<Category> categoryList = categoryService.getAll();
         List<CategoryDto> categoryDtoList = MapperUtil.convertList(categoryList, this::convertToCategoryDto);
@@ -43,6 +58,14 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = CategoryDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     public ResponseEntity<CategoryDto> getById(@PathVariable Long id) {
         Category category = categoryService.getById(id);
         CategoryDto categoryDto = convertToCategoryDto(category);
@@ -52,6 +75,16 @@ public class CategoryController {
         return new ResponseEntity<>(categoryDto, HttpStatus.OK);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created",
+                    content = @Content(schema = @Schema(implementation = CategoryDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "401", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto categoryDto) {
 
@@ -67,6 +100,16 @@ public class CategoryController {
         return new ResponseEntity<>(createdCategoryDto, HttpStatus.CREATED);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created",
+                    content = @Content(schema = @Schema(implementation = CategoryDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "401", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     @PostMapping(value = "/import", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<CategoryDto>> createCategories(
             @RequestBody List<CategoryDto> categoryDtoList) {
@@ -89,6 +132,16 @@ public class CategoryController {
         return new ResponseEntity<>(createdCategoryDtoList, HttpStatus.CREATED);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = CategoryDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "401", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long id, @RequestBody CategoryDto categoryDto) {
 
@@ -103,6 +156,14 @@ public class CategoryController {
         return new ResponseEntity<>(updatedCategoryDto, HttpStatus.OK);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = CategoryDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
 

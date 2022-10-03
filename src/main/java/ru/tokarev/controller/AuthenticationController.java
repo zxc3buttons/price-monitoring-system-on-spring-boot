@@ -1,5 +1,9 @@
 package ru.tokarev.controller;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.tokarev.dto.ApiErrorDto;
 import ru.tokarev.dto.userdto.AuthenticationRequestDto;
 import ru.tokarev.dto.userdto.LoginResponseDto;
 import ru.tokarev.security.UserDetailsImpl;
@@ -38,6 +43,14 @@ public class AuthenticationController {
 
 
     @PostMapping("/login")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authorized",
+                    content = @Content(schema = @Schema(implementation = LoginResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+    })
     public ResponseEntity<Object> login(@RequestBody AuthenticationRequestDto requestDto) {
 
         log.info("POST request for /login with username {} and password {}", requestDto.getUsername(),

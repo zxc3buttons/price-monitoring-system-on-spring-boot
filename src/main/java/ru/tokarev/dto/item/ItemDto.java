@@ -16,12 +16,13 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class ItemDto {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Integer id;
+
     @JsonProperty("product")
     private ProductForItemDto productForItemDto;
 
     private Integer price;
-
-    private Integer id;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateStart;

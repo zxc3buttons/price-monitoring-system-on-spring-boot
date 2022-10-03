@@ -1,5 +1,9 @@
 package ru.tokarev.controller;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.tokarev.dto.ApiErrorDto;
+import ru.tokarev.dto.CategoryDto;
 import ru.tokarev.dto.MarketPlaceDto;
 import ru.tokarev.dto.item.ItemDto;
 import ru.tokarev.dto.item.ProductForItemDto;
@@ -37,6 +43,14 @@ public class ItemController {
     }
 
     @GetMapping
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = ItemDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     public ResponseEntity<List<ItemDto>> getAll() {
 
         log.info("GET request for /items with no data");
@@ -55,6 +69,14 @@ public class ItemController {
     }
 
     @GetMapping("/{serial-number}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = ItemDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     public ResponseEntity<ItemDto> getById(
             @PathVariable(value = "serial-number") Long serialNumber) {
 
@@ -72,6 +94,14 @@ public class ItemController {
     }
 
     @GetMapping("/check-price-dynamic")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = ItemDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Products, marketplaces or items not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     public ResponseEntity<Object> getItemPriceDynamic(
             @RequestParam(name = "product_id") Long productId,
             @RequestParam(name = "date_start") String dateStart,
@@ -109,6 +139,14 @@ public class ItemController {
     }
 
     @GetMapping("/compare-prices")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = ItemDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Products or items not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     public ResponseEntity<Object> getItemPriceComparing(
             @RequestParam(name = "product_id", required = false) Long productId,
             @RequestParam(name = "date_start") String dateStart,
@@ -139,6 +177,17 @@ public class ItemController {
         return new ResponseEntity<>(productPriceComparingDtoList, HttpStatus.OK);
     }
 
+    @GetMapping("/compare-prices")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created",
+                    content = @Content(schema = @Schema(implementation = ItemDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Products or marketplaces not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "409", description = "Item for this period already added",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ItemDto> createItem(@RequestBody ItemDto itemDto) {
 
@@ -166,7 +215,17 @@ public class ItemController {
     }
 
     @PostMapping(value = "/import", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ItemDto>> importProductsOnMarket(
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created",
+                    content = @Content(schema = @Schema(implementation = ItemDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Products or marketplaces not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "409", description = "Item for this period already added",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
+    public ResponseEntity<List<ItemDto>> importItems(
             @RequestBody List<ItemDto> itemDtoList) {
 
         log.info("POST request for /items/import with data {}", itemDtoList);
@@ -200,6 +259,14 @@ public class ItemController {
     }
 
     @DeleteMapping(value = "/{serial-number}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = ItemDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Item not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+    })
     public ResponseEntity<String> deleteItem(@PathVariable(value = "serial-number") Long serialNumber) {
 
         log.info("DELETE request for /items/{} with data {}", serialNumber, serialNumber);

@@ -53,7 +53,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public Item getById(Long serialNumber) {
         Item item = itemRepository.findById(serialNumber).orElseThrow(
-                () -> new ItemNotFoundException("Product on market with this id not found")
+                () -> new ItemNotFoundException("Item with this id not found")
         );
 
         item.setProduct((Product) Hibernate.unproxy(item.getProduct()));
@@ -97,11 +97,11 @@ public class ItemServiceImpl implements ItemService {
 
         List<Item> itemList = itemRepository.findAllByProductAndMarketplaceAndOrderByDateStartAsc(
                 product, marketplace).orElseThrow(
-                () -> new ItemNotFoundException("Products on markets not found")
+                () -> new ItemNotFoundException("Items not found")
         );
 
         if (itemList.size() == 0) {
-            throw new ItemNotFoundException("Products on markets not found");
+            throw new ItemNotFoundException("Items not found");
         }
 
         List<LocalDate> datesBetween = dateStart.datesUntil(dateEnd).collect(Collectors.toList());

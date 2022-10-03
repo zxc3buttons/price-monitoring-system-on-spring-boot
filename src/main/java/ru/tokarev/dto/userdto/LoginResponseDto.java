@@ -13,11 +13,11 @@ import java.util.List;
 @AllArgsConstructor
 public class LoginResponseDto {
 
+    private Long id;
+
     private String token;
 
     private String type = "Bearer";
-
-    private Long id;
 
     private String username;
 

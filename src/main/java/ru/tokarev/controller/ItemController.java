@@ -176,8 +176,7 @@ public class ItemController {
 
         return new ResponseEntity<>(productPriceComparingDtoList, HttpStatus.OK);
     }
-
-    @GetMapping("/compare-prices")
+    
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created",
                     content = @Content(schema = @Schema(implementation = ItemDto.class))),

@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.tokarev.dto.ApiErrorDto;
-import ru.tokarev.dto.CategoryDto;
 import ru.tokarev.dto.MarketPlaceDto;
 import ru.tokarev.dto.item.ItemDto;
 import ru.tokarev.dto.item.ProductForItemDto;

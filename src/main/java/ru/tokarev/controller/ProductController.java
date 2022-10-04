@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.tokarev.dto.ApiErrorDto;
 import ru.tokarev.dto.CategoryDto;
-import ru.tokarev.dto.MarketPlaceDto;
 import ru.tokarev.dto.ProductDto;
 import ru.tokarev.entity.Product;
 import ru.tokarev.service.productservice.ProductService;

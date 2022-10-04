@@ -13,10 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.tokarev.dto.ApiErrorDto;
 import ru.tokarev.dto.RoleDto;
-import ru.tokarev.dto.userdto.LoginResponseDto;
 import ru.tokarev.dto.userdto.UserDto;
 import ru.tokarev.entity.User;
-import ru.tokarev.exception.categoryexception.CategoryNotFoundException;
 import ru.tokarev.service.userservice.UserService;
 import ru.tokarev.utils.MapperUtil;
 

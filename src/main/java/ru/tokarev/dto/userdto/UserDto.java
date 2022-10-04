@@ -1,6 +1,7 @@
 package ru.tokarev.dto.userdto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import ru.tokarev.dto.RoleDto;
 @AllArgsConstructor
 public class UserDto {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
     private String username;
@@ -26,6 +27,6 @@ public class UserDto {
 
     private String password;
 
-    @JsonProperty(value = "role", access = JsonProperty.Access.READ_ONLY)
+    @JsonProperty(value = "role")
     private RoleDto roleDto;
 }

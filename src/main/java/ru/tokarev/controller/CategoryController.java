@@ -13,9 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.tokarev.dto.ApiErrorDto;
 import ru.tokarev.dto.CategoryDto;
-import ru.tokarev.dto.userdto.LoginResponseDto;
 import ru.tokarev.entity.Category;
-import ru.tokarev.exception.categoryexception.CategoryNotFoundException;
 import ru.tokarev.service.categoryservice.CategoryService;
 import ru.tokarev.utils.MapperUtil;
 

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.tokarev.dto.ApiErrorDto;
-import ru.tokarev.dto.ProductDto;
 import ru.tokarev.dto.RoleDto;
 import ru.tokarev.dto.userdto.SignupDto;
 import ru.tokarev.dto.userdto.UserDto;

@@ -75,6 +75,7 @@ public class CategoryController {
         return new ResponseEntity<>(categoryDto, HttpStatus.OK);
     }
 
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created",
                     content = @Content(schema = @Schema(implementation = CategoryDto.class))),
@@ -85,7 +86,6 @@ public class CategoryController {
             @ApiResponse(responseCode = "401", description = "Bad request",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto categoryDto) {
 
         log.info("POST request /categories with data {}", categoryDto.getName());
@@ -156,6 +156,7 @@ public class CategoryController {
         return new ResponseEntity<>(updatedCategoryDto, HttpStatus.OK);
     }
 
+    @DeleteMapping(value = "/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(schema = @Schema(implementation = CategoryDto.class))),
@@ -164,7 +165,6 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
-    @DeleteMapping(value = "/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
 
         log.info("DELETE request /categories/{} with data {}", id, id);

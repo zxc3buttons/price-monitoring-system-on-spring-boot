@@ -79,7 +79,8 @@ public class MarketPlaceServiceImpl implements MarketPlaceService {
         );
         existingMarketplace.setName(marketPlace.getName());
 
-        return Optional.of(marketplaceRepository.save(existingMarketplace)).orElseThrow(MarketPlaceBadRequestException::new);
+        return Optional.of(marketplaceRepository.save(existingMarketplace))
+                .orElseThrow(MarketPlaceBadRequestException::new);
     }
 
     @Override

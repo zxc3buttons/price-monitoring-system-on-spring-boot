@@ -12,24 +12,25 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.tokarev.dto.ApiErrorDto;
-import ru.tokarev.dto.MarketPlaceDto;
+import ru.tokarev.dto.MarketplaceDto;
 import ru.tokarev.entity.Marketplace;
 import ru.tokarev.service.marketplaceservice.MarketPlaceService;
 import ru.tokarev.utils.MapperUtil;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
 @RequestMapping("/api/marketplaces")
 @RestController
-public class MarketPlaceController {
+public class MarketplaceController {
 
     private final MarketPlaceService marketPlaceService;
 
     private final ModelMapper modelMapper;
 
     @Autowired
-    public MarketPlaceController(MarketPlaceService marketPlaceService, ModelMapper modelMapper) {
+    public MarketplaceController(MarketPlaceService marketPlaceService, ModelMapper modelMapper) {
         this.marketPlaceService = marketPlaceService;
         this.modelMapper = modelMapper;
     }
@@ -37,41 +38,41 @@ public class MarketPlaceController {
     @GetMapping
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(schema = @Schema(implementation = MarketPlaceDto.class))),
+                    content = @Content(schema = @Schema(implementation = MarketplaceDto.class))),
             @ApiResponse(responseCode = "403", description = "Forbidden",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
-    public ResponseEntity<List<MarketPlaceDto>> getAll() {
+    public ResponseEntity<List<MarketplaceDto>> getAll() {
 
         List<Marketplace> marketplaceList = marketPlaceService.getAll();
-        List<MarketPlaceDto> marketPlaceDtoList = MapperUtil.
+        List<MarketplaceDto> marketplaceDtoList = MapperUtil.
                 convertList(marketplaceList, this::convertToMarketPlaceDto);
 
-        log.info("Response for GET request /marketplaces with data {}", marketPlaceDtoList);
-        for (MarketPlaceDto marketPlaceDto : marketPlaceDtoList) {
+        log.info("Response for GET request /marketplaces with data {}", marketplaceDtoList);
+        for (MarketplaceDto marketPlaceDto : marketplaceDtoList) {
             log.info("id {}, name {}", marketPlaceDto.getId(), marketPlaceDto.getName());
         }
 
-        return new ResponseEntity<>(marketPlaceDtoList, HttpStatus.OK);
+        return new ResponseEntity<>(marketplaceDtoList, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(schema = @Schema(implementation = MarketPlaceDto.class))),
+                    content = @Content(schema = @Schema(implementation = MarketplaceDto.class))),
             @ApiResponse(responseCode = "403", description = "Forbidden",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
-    public ResponseEntity<MarketPlaceDto> getById(@PathVariable Long id) {
+    public ResponseEntity<MarketplaceDto> getById(@PathVariable Long id) {
 
         log.info("GET request /marketplaces/{} with data {}", id, id);
 
         Marketplace marketPlace = marketPlaceService.getById(id);
-        MarketPlaceDto marketPlaceDto = convertToMarketPlaceDto(marketPlace);
+        MarketplaceDto marketPlaceDto = convertToMarketPlaceDto(marketPlace);
 
         log.info("Response for GET request /marketplaces with data: id {}, name {}",
                 marketPlaceDto.getId(), marketPlaceDto.getName());
@@ -82,50 +83,50 @@ public class MarketPlaceController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created",
-                    content = @Content(schema = @Schema(implementation = MarketPlaceDto.class))),
+                    content = @Content(schema = @Schema(implementation = MarketplaceDto.class))),
             @ApiResponse(responseCode = "403", description = "Forbidden",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
             @ApiResponse(responseCode = "401", description = "Bad request",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
-    public ResponseEntity<MarketPlaceDto> createMarketPlace(@RequestBody MarketPlaceDto marketPlaceDto) {
+    public ResponseEntity<MarketplaceDto> createMarketPlace(@Valid @RequestBody MarketplaceDto marketPlaceDto) {
 
         log.info("POST request /marketplaces with data: name {}", marketPlaceDto.getName());
 
         Marketplace marketPlace = convertToMarketPlaceEntity(marketPlaceDto);
         Marketplace createdMarketplace = marketPlaceService.createMarketPlace(marketPlace);
-        MarketPlaceDto createdMarketPlaceDto = convertToMarketPlaceDto(createdMarketplace);
+        MarketplaceDto createdMarketplaceDto = convertToMarketPlaceDto(createdMarketplace);
 
         log.info("Response for POST request /marketplaces with data: id {}, name {}",
-                createdMarketPlaceDto.getId(), createdMarketPlaceDto.getName());
+                createdMarketplaceDto.getId(), createdMarketplaceDto.getName());
 
-        return new ResponseEntity<>(createdMarketPlaceDto, HttpStatus.CREATED);
+        return new ResponseEntity<>(createdMarketplaceDto, HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/import", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created",
-                    content = @Content(schema = @Schema(implementation = MarketPlaceDto.class))),
+                    content = @Content(schema = @Schema(implementation = MarketplaceDto.class))),
             @ApiResponse(responseCode = "403", description = "Forbidden",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
             @ApiResponse(responseCode = "401", description = "Bad request",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
-    public ResponseEntity<List<MarketPlaceDto>> createMarketplaces(
-            @RequestBody List<MarketPlaceDto> marketPlaceDtoList) {
+    public ResponseEntity<List<MarketplaceDto>> createMarketplaces(
+            @Valid @RequestBody List<MarketplaceDto> marketplaceDtoList) {
 
-        log.info("POST request /marketplaces with data {}", marketPlaceDtoList);
-        for (MarketPlaceDto marketPlaceDto : marketPlaceDtoList) {
+        log.info("POST request /marketplaces with data {}", marketplaceDtoList);
+        for (MarketplaceDto marketPlaceDto : marketplaceDtoList) {
             log.info("name {}", marketPlaceDto.getName());
         }
 
-        List<Marketplace> marketplaceList = MapperUtil.convertList(marketPlaceDtoList, this::convertToMarketPlaceEntity);
+        List<Marketplace> marketplaceList = MapperUtil.convertList(marketplaceDtoList, this::convertToMarketPlaceEntity);
         List<Marketplace> createdMarketplaceList = marketPlaceService.createMarketPlaces(marketplaceList);
-        List<MarketPlaceDto> createdMarketplaceDtoList = MapperUtil.convertList(
+        List<MarketplaceDto> createdMarketplaceDtoList = MapperUtil.convertList(
                 createdMarketplaceList, this::convertToMarketPlaceDto);
 
         log.info("Response for POST request /marketplaces with data {}", createdMarketplaceDtoList);
-        for (MarketPlaceDto marketPlaceDto : createdMarketplaceDtoList) {
+        for (MarketplaceDto marketPlaceDto : createdMarketplaceDtoList) {
             log.info("id {}, name {}", marketPlaceDto.getId(), marketPlaceDto.getName());
         }
 
@@ -135,7 +136,7 @@ public class MarketPlaceController {
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created",
-                    content = @Content(schema = @Schema(implementation = MarketPlaceDto.class))),
+                    content = @Content(schema = @Schema(implementation = MarketplaceDto.class))),
             @ApiResponse(responseCode = "403", description = "Forbidden",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found",
@@ -143,24 +144,24 @@ public class MarketPlaceController {
             @ApiResponse(responseCode = "401", description = "Bad request",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
-    public ResponseEntity<MarketPlaceDto> updateMarketPlace(@PathVariable Long id,
-                                                            @RequestBody MarketPlaceDto marketPlaceDto) {
+    public ResponseEntity<MarketplaceDto> updateMarketPlace(@PathVariable Long id,
+                                                            @Valid @RequestBody MarketplaceDto marketPlaceDto) {
 
         log.info("PATCH request /marketplaces/{} with data: name {}", id, marketPlaceDto.getName());
 
         Marketplace marketPlace = convertToMarketPlaceEntity(marketPlaceDto);
         Marketplace updatedMarketplace = marketPlaceService.updateMarketPlace(id, marketPlace);
-        MarketPlaceDto updatedMarketPlaceDto = convertToMarketPlaceDto(updatedMarketplace);
+        MarketplaceDto updatedMarketplaceDto = convertToMarketPlaceDto(updatedMarketplace);
 
         log.info("Response for PATCH request /marketplaces/{} with data: name {}", id, marketPlaceDto.getName());
 
-        return new ResponseEntity<>(updatedMarketPlaceDto, HttpStatus.OK);
+        return new ResponseEntity<>(updatedMarketplaceDto, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(schema = @Schema(implementation = MarketPlaceDto.class))),
+                    content = @Content(schema = @Schema(implementation = MarketplaceDto.class))),
             @ApiResponse(responseCode = "403", description = "Forbidden",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found",
@@ -178,11 +179,11 @@ public class MarketPlaceController {
         return ResponseEntity.ok().body("Marketplace deleted successfully");
     }
 
-    private MarketPlaceDto convertToMarketPlaceDto(Marketplace marketPlace) {
-        return modelMapper.map(marketPlace, MarketPlaceDto.class);
+    private MarketplaceDto convertToMarketPlaceDto(Marketplace marketPlace) {
+        return modelMapper.map(marketPlace, MarketplaceDto.class);
     }
 
-    private Marketplace convertToMarketPlaceEntity(MarketPlaceDto marketPlaceDto) {
+    private Marketplace convertToMarketPlaceEntity(MarketplaceDto marketPlaceDto) {
         return modelMapper.map(marketPlaceDto, Marketplace.class);
     }
 }

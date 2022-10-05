@@ -17,6 +17,7 @@ import ru.tokarev.entity.Category;
 import ru.tokarev.service.categoryservice.CategoryService;
 import ru.tokarev.utils.MapperUtil;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -84,7 +85,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "401", description = "Bad request",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
-    public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto categoryDto) {
+    public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryDto categoryDto) {
 
         log.info("POST request /categories with data {}", categoryDto.getName());
 
@@ -110,7 +111,7 @@ public class CategoryController {
     })
     @PostMapping(value = "/import", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<CategoryDto>> createCategories(
-            @RequestBody List<CategoryDto> categoryDtoList) {
+            @Valid @RequestBody List<CategoryDto> categoryDtoList) {
 
         log.info("POST request /categories/import with data {}", categoryDtoList);
         for (CategoryDto categoryDto : categoryDtoList) {
@@ -141,7 +142,8 @@ public class CategoryController {
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long id, @RequestBody CategoryDto categoryDto) {
+    public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long id, @Valid
+    @RequestBody CategoryDto categoryDto) {
 
         log.info("PATCH request /categories/{} with data {}", id, categoryDto.getName());
 

@@ -12,16 +12,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.tokarev.dto.ApiErrorDto;
-import ru.tokarev.dto.MarketPlaceDto;
-import ru.tokarev.dto.item.ItemDto;
-import ru.tokarev.dto.item.ProductForItemDto;
-import ru.tokarev.dto.item.ProductPriceComparingDto;
-import ru.tokarev.dto.item.ProductPriceDifferenceDto;
+import ru.tokarev.dto.MarketplaceDto;
+import ru.tokarev.dto.item.*;
 import ru.tokarev.entity.item.Item;
 import ru.tokarev.exception.itemexception.ItemBadRequestException;
 import ru.tokarev.service.itemservice.ItemService;
 import ru.tokarev.utils.MapperUtil;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +83,8 @@ public class ItemController {
         ItemDto itemDto = convertToItemDto(item);
 
         log.info("Response for GET request for /items/{} with itemDto:" +
-                        " serialNumber {}, productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}", serialNumber,
+                        " serialNumber {}, productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}",
+                serialNumber,
                 item.getId(), item.getProduct().getId(), item.getPrice(), item.getMarketplace().getId(),
                 item.getDateStart(), item.getDateEnd());
 
@@ -187,11 +186,12 @@ public class ItemController {
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ItemDto> createItem(@RequestBody ItemDto itemDto) {
+    public ResponseEntity<ItemDto> createItem(@Valid @RequestBody ItemDto itemDto) {
 
         log.info("POST request for /items with data:" +
                         " productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}",
-                itemDto.getProductForItemDto().getId(), itemDto.getPrice(), itemDto.getMarketPlaceDto().getId(),
+                itemDto.getProductForItemDto().getId(), itemDto.getPrice(),
+                itemDto.getMarketplaceForItemRequestDto().getId(),
                 itemDto.getDateStart(), itemDto.getDateEnd());
 
         if (itemDto.getDateEnd().isBefore((itemDto.getDateStart()))) {
@@ -206,7 +206,7 @@ public class ItemController {
                         "serialNumber {}, productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}",
                 createdItemDto.getId(),
                 createdItemDto.getProductForItemDto().getId(), createdItemDto.getPrice(),
-                createdItemDto.getMarketPlaceDto().getId(),
+                createdItemDto.getMarketplaceForItemRequestDto().getId(),
                 createdItemDto.getDateStart(), createdItemDto.getDateEnd());
 
         return new ResponseEntity<>(createdItemDto, HttpStatus.CREATED);
@@ -224,13 +224,13 @@ public class ItemController {
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
     public ResponseEntity<List<ItemDto>> importItems(
-            @RequestBody List<ItemDto> itemDtoList) {
+            @Valid @RequestBody List<ItemDto> itemDtoList) {
 
         log.info("POST request for /items/import with data {}", itemDtoList);
         for (ItemDto itemDto : itemDtoList) {
             log.info("productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}",
                     itemDto.getProductForItemDto().getId(), itemDto.getPrice(),
-                    itemDto.getMarketPlaceDto().getId(), itemDto.getDateStart(), itemDto.getDateEnd());
+                    itemDto.getMarketplaceForItemRequestDto().getId(), itemDto.getDateStart(), itemDto.getDateEnd());
         }
 
         for (ItemDto itemDto : itemDtoList) {
@@ -250,7 +250,7 @@ public class ItemController {
         for (ItemDto itemDto : createdProductsOnMarketDtoList) {
             log.info("serialNumber {}, productId {}, price {}, marketplaceId {} dateStart {}, dateEnd {}",
                     itemDto.getId(), itemDto.getProductForItemDto().getId(), itemDto.getPrice(),
-                    itemDto.getMarketPlaceDto().getId(), itemDto.getDateStart(), itemDto.getDateEnd());
+                    itemDto.getMarketplaceForItemRequestDto().getId(), itemDto.getDateStart(), itemDto.getDateEnd());
         }
 
         return new ResponseEntity<>(createdProductsOnMarketDtoList, HttpStatus.CREATED);
@@ -278,10 +278,11 @@ public class ItemController {
 
     private ItemDto convertToItemDto(Item item) {
         ProductForItemDto productForItemDto = modelMapper.map(item.getProduct(), ProductForItemDto.class);
-        MarketPlaceDto marketPlaceDto = modelMapper.map(item.getMarketplace(), MarketPlaceDto.class);
+        MarketplaceForItemRequestDto marketplaceForItemRequestDto
+                = modelMapper.map(item.getMarketplace(), MarketplaceForItemRequestDto.class);
         ItemDto itemDto = modelMapper.map(item, ItemDto.class);
         itemDto.setProductForItemDto(productForItemDto);
-        itemDto.setMarketPlaceDto(marketPlaceDto);
+        itemDto.setMarketplaceForItemRequestDto(marketplaceForItemRequestDto);
 
         return itemDto;
     }

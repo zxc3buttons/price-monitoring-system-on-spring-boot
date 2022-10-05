@@ -1,10 +1,11 @@
 package ru.tokarev.service.itemservice;
 
-import org.hibernate.Hibernate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import ru.tokarev.dto.item.PriceByDayDto;
 import ru.tokarev.dto.item.ProductPriceComparingDto;
 import ru.tokarev.dto.item.ProductPriceDifferenceDto;
@@ -20,14 +21,12 @@ import ru.tokarev.repository.ItemRepository;
 import ru.tokarev.repository.MarketplaceRepository;
 import ru.tokarev.repository.ProductRepository;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
@@ -36,15 +35,12 @@ public class ItemServiceImpl implements ItemService {
 
     private final MarketplaceRepository marketplaceRepository;
 
-    private final Validator validator;
-
     @Autowired
     public ItemServiceImpl(ItemRepository itemRepository, ProductRepository productRepository,
-                           MarketplaceRepository marketplaceRepository, Validator validator) {
+                           MarketplaceRepository marketplaceRepository) {
         this.itemRepository = itemRepository;
         this.productRepository = productRepository;
         this.marketplaceRepository = marketplaceRepository;
-        this.validator = validator;
     }
 
 
@@ -52,14 +48,10 @@ public class ItemServiceImpl implements ItemService {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     @Transactional
     public Item getById(Long serialNumber) {
-        Item item = itemRepository.findById(serialNumber).orElseThrow(
+
+        return itemRepository.findById(serialNumber).orElseThrow(
                 () -> new ItemNotFoundException("Item with this id not found")
         );
-
-        item.setProduct((Product) Hibernate.unproxy(item.getProduct()));
-        item.setMarketplace((Marketplace) Hibernate.unproxy(item.getMarketplace()));
-
-        return item;
     }
 
     @Override
@@ -72,11 +64,6 @@ public class ItemServiceImpl implements ItemService {
 
         if (itemList.size() == 0) {
             throw new ItemNotFoundException("Products on markets not found");
-        }
-
-        for (Item item : itemList) {
-            item.setProduct((Product) Hibernate.unproxy(item.getProduct()));
-            item.setMarketplace((Marketplace) Hibernate.unproxy(item.getMarketplace()));
         }
 
         return itemList;
@@ -184,7 +171,6 @@ public class ItemServiceImpl implements ItemService {
 
         Map<LocalDate, Map<String, Integer>> marketplaceEverydayPricesMap = new TreeMap<>();
         for (Item item : itemList) {
-            item.setMarketplace((Marketplace) Hibernate.unproxy(item.getMarketplace()));
             List<LocalDate> datesOfProduct = item.getDateStart().datesUntil(item.getDateEnd())
                     .collect(Collectors.toList());
             for (LocalDate date : datesOfProduct) {
@@ -210,15 +196,6 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public Item createItem(Item item) {
 
-        Set<ConstraintViolation<Item>> violations = validator.validate(item);
-
-        if (!violations.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<Item> constraintViolation : violations) {
-                sb.append(constraintViolation.getMessage());
-            }
-            throw new ConstraintViolationException("Error occurred: " + sb, violations);
-        }
 
         List<Item> productOnMarketListWithCertainProductAndMarketplace =
                 itemRepository.findAllByProductAndMarketplaceAndOrderByDateStartAsc(item.getProduct(),
@@ -249,6 +226,7 @@ public class ItemServiceImpl implements ItemService {
         item.setMarketplace(marketplace);
         return Optional.of(itemRepository.save(item)).orElseThrow(
                 () -> new ItemBadRequestException("Bad request"));
+
     }
 
     @Override

@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 @Getter
@@ -22,5 +24,7 @@ public class Category implements Serializable {
     private Long id;
 
     @Column(name = "name")
+    @NotBlank(message = "name is mandatory")
+    @Pattern(regexp = "^[a-zA-Z]*$")
     private String name;
 }

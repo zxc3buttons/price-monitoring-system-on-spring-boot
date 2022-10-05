@@ -21,6 +21,8 @@ import ru.tokarev.dto.userdto.UserDto;
 import ru.tokarev.entity.User;
 import ru.tokarev.service.userservice.UserService;
 
+import javax.validation.Valid;
+
 @Slf4j
 @RequestMapping(value = "/api")
 @RestController
@@ -43,13 +45,13 @@ public class RegistrationController {
             @ApiResponse(responseCode = "401", description = "Bad request",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
-    public ResponseEntity<UserDto> signup(@RequestBody SignupDto signupDto) {
+    public ResponseEntity<UserDto> signup(@Valid @RequestBody SignupDto signupDto) {
 
         log.info("POST request for /signup with data: username {}, firstName {}, lastName {}, email {}, password {}",
                 signupDto.getUsername(), signupDto.getFirstName(), signupDto.getLastName(),
                 signupDto.getEmail(), signupDto.getPassword());
 
-        User user = convertToUserEntity(signupDto);
+        User user = convertFromSignupDtoToUserEntity(signupDto);
         User createdUser = userService.createUser(user);
         UserDto createdUserDto = convertToUserDto(createdUser);
 
@@ -69,7 +71,7 @@ public class RegistrationController {
         return userDto;
     }
 
-    private User convertToUserEntity(UserDto userDto) {
-        return modelMapper.map(userDto, User.class);
+    private User convertFromSignupDtoToUserEntity(SignupDto signupDto) {
+        return modelMapper.map(signupDto, User.class);
     }
 }

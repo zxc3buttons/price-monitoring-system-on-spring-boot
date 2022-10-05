@@ -23,6 +23,7 @@ import ru.tokarev.dto.userdto.LoginResponseDto;
 import ru.tokarev.security.UserDetailsImpl;
 import ru.tokarev.security.jwt.JwtUtils;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +52,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "401", description = "Unauthorized",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
     })
-    public ResponseEntity<Object> login(@RequestBody AuthenticationRequestDto requestDto) {
+    public ResponseEntity<Object> login(@Valid @RequestBody AuthenticationRequestDto requestDto) {
 
         log.info("POST request for /login with username {} and password {}", requestDto.getUsername(),
                 requestDto.getPassword());

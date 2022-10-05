@@ -1,11 +1,15 @@
 package ru.tokarev.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 @Getter
@@ -22,8 +26,13 @@ public class Product implements Serializable {
     private Long id;
 
     @Column(name = "name")
+
+    @NotBlank(message = "name is mandatory")
+    @Pattern(regexp = "^[a-zA-Z]*$")
     private String name;
 
+    @JsonProperty("category")
+    @Valid
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;

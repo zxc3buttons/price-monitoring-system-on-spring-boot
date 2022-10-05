@@ -14,10 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import ru.tokarev.dto.ApiErrorDto;
 import ru.tokarev.dto.RoleDto;
 import ru.tokarev.dto.userdto.UserDto;
+import ru.tokarev.dto.userdto.UserRoleToUpdateRequestDto;
 import ru.tokarev.entity.User;
+import ru.tokarev.exception.userexception.UserBadRequestException;
 import ru.tokarev.service.userservice.UserService;
 import ru.tokarev.utils.MapperUtil;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -96,7 +99,7 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserDto userDto) {
 
         log.info("PATCH request for /users/{} with data:" +
                         " username {}, firstName {}, lastName {}, email {}, password {}, roleId {}", id,
@@ -127,14 +130,14 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
     @PatchMapping(value = "/{id}/update-role", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> updateUserRole(@PathVariable Long id, @RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> updateUserRole(@PathVariable Long id, @Valid @RequestBody UserRoleToUpdateRequestDto
+            userRoleToUpdateRequestDto) {
 
         log.info("PATCH request for /users/{}/update_role with data:" +
-                        " username {}, firstName {}, lastName {}, email {}, password {}, roleId {}", id,
-                userDto.getUsername(), userDto.getFirstName(), userDto.getLastName(),
-                userDto.getEmail(), userDto.getPassword(), userDto.getRoleDto().getId());
+                        " roleId {}", id,
+                userRoleToUpdateRequestDto.getRoleDto().getId());
 
-        User user = convertToUserEntity(userDto);
+        User user = convertFromUserRoleToUpdateRequestDtoToUserEntity(userRoleToUpdateRequestDto);
         User updatedUser = userService.updateUserRole(id, user);
         UserDto updatedUserDto = convertToUserDto(updatedUser);
 
@@ -177,5 +180,10 @@ public class UserController {
 
     private User convertToUserEntity(UserDto userDto) {
         return modelMapper.map(userDto, User.class);
+    }
+
+    private User convertFromUserRoleToUpdateRequestDtoToUserEntity(UserRoleToUpdateRequestDto
+                                                                           userRoleToUpdateRequestDto) {
+        return modelMapper.map(userRoleToUpdateRequestDto, User.class);
     }
 }

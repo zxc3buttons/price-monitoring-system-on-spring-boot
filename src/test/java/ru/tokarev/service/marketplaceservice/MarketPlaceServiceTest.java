@@ -6,12 +6,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.tokarev.entity.Marketplace;
+import ru.tokarev.entity.Product;
+import ru.tokarev.exception.marketplaceexception.MarketPlaceNotFoundException;
+import ru.tokarev.exception.productexception.ProductNotFoundException;
 import ru.tokarev.repository.MarketplaceRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
@@ -98,5 +102,33 @@ class MarketPlaceServiceTest {
 
         //assert
         verify(marketplaceRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void givenNothing_whenFindMarketplace_ThrowNotFoundException() {
+        assertThrows(MarketPlaceNotFoundException.class, () -> {
+            marketPlaceService.getById(1L);
+        });
+    }
+
+    @Test
+    void givenNothing_whenFindAll_ThrowNotFoundException() {
+        assertThrows(MarketPlaceNotFoundException.class, () -> {
+            marketPlaceService.getAll();
+        });
+    }
+
+    @Test
+    void givenNothing_whenUpdateMarketplace_ThrowNotFoundException() {
+        assertThrows(MarketPlaceNotFoundException.class, () -> {
+            marketPlaceService.updateMarketPlace(1L, new Marketplace());
+        });
+    }
+
+    @Test
+    void givenNothing_whenDeleteMarketplace_ThrowNotFoundException() {
+        assertThrows(MarketPlaceNotFoundException.class, () -> {
+            marketPlaceService.deleteMarketPlace(1L);
+        });
     }
 }

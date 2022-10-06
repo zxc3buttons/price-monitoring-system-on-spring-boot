@@ -179,7 +179,7 @@ class UserServiceTest {
     }
 
     @Test
-    void givenNothing_whenDeleteUserRole_ThrowNotFoundException() {
+    void givenNothing_whenDeleteUser_ThrowNotFoundException() {
         assertThrows(UserNotFoundException.class, () -> {
             userService.deleteUser(1L);
         });

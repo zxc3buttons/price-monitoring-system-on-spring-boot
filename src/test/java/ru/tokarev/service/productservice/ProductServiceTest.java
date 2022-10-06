@@ -7,6 +7,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.tokarev.entity.Category;
 import ru.tokarev.entity.Product;
+import ru.tokarev.entity.User;
+import ru.tokarev.exception.productexception.ProductNotFoundException;
+import ru.tokarev.exception.userexception.UserNotFoundException;
 import ru.tokarev.repository.CategoryRepository;
 import ru.tokarev.repository.ProductRepository;
 
@@ -14,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
@@ -135,5 +139,33 @@ class ProductServiceTest {
 
         //assert
         verify(productRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void givenNothing_whenFindProduct_ThrowNotFoundException() {
+        assertThrows(ProductNotFoundException.class, () -> {
+            productService.getById(1L);
+        });
+    }
+
+    @Test
+    void givenNothing_whenFindAll_ThrowNotFoundException() {
+        assertThrows(ProductNotFoundException.class, () -> {
+            productService.getAll(null);
+        });
+    }
+
+    @Test
+    void givenNothing_whenUpdateProduct_ThrowNotFoundException() {
+        assertThrows(ProductNotFoundException.class, () -> {
+            productService.updateProduct(1L, new Product());
+        });
+    }
+
+    @Test
+    void givenNothing_whenDeleteProduct_ThrowNotFoundException() {
+        assertThrows(ProductNotFoundException.class, () -> {
+            productService.deleteProduct(1L);
+        });
     }
 }

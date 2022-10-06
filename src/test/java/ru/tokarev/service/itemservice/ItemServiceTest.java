@@ -12,6 +12,11 @@ import ru.tokarev.entity.Category;
 import ru.tokarev.entity.Marketplace;
 import ru.tokarev.entity.Product;
 import ru.tokarev.entity.item.Item;
+import ru.tokarev.exception.categoryexception.CategoryNotFoundException;
+import ru.tokarev.exception.itemexception.ItemNotFoundException;
+import ru.tokarev.exception.marketplaceexception.MarketPlaceNotFoundException;
+import ru.tokarev.exception.productexception.ProductNotFoundException;
+import ru.tokarev.exception.userexception.UserNotFoundException;
 import ru.tokarev.repository.ItemRepository;
 import ru.tokarev.repository.MarketplaceRepository;
 import ru.tokarev.repository.ProductRepository;
@@ -24,6 +29,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
@@ -324,5 +330,48 @@ class ItemServiceTest {
 
         //assert
         verify(itemRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void givenNothing_whenFindItem_ThrowNotFoundException() {
+        assertThrows(ItemNotFoundException.class, () -> {
+            itemService.getById(1L);
+        });
+    }
+
+    @Test
+    void givenNothing_whenFindAll_ThrowNotFoundException() {
+        assertThrows(ItemNotFoundException.class, () -> {
+            itemService.getAll();
+        });
+    }
+
+    @Test
+    void givenNothing_whenDeleteItem_ThrowNotFoundException() {
+        assertThrows(ItemNotFoundException.class, () -> {
+            itemService.deleteItem(1L);
+        });
+    }
+
+    @Test
+    void givenNothing_whenCheckPriceDynamicForOneItemAndOneMarketplace_ThrowNotFoundException() {
+        assertThrows(ProductNotFoundException.class, () -> {
+            itemService.checkPriceDynamicForOneItemAndOneMarketplace(
+                    null, null, null, null);
+        });
+    }
+
+    @Test
+    void givenNothing_whenCheckPriceDynamicForOneItem_ThrowNotFoundException() {
+        assertThrows(ItemNotFoundException.class, () -> {
+            itemService.checkPriceDynamicForOneItem(null,  null, null);
+        });
+    }
+
+    @Test
+    void givenNothing_whenGetItemPriceComparing_ThrowNotFoundException() {
+        assertThrows(ProductNotFoundException.class, () -> {
+            itemService.getItemPriceComparing(null, null, null);
+        });
     }
 }

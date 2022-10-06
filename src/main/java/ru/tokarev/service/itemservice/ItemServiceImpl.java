@@ -79,7 +79,7 @@ public class ItemServiceImpl implements ItemService {
                 () -> new ProductNotFoundException("Product with this id doesn't exist")
         );
         Marketplace marketplace = marketplaceRepository.findById(marketplaceId).orElseThrow(
-                () -> new ProductNotFoundException("Marketplace with this id doesn't exist")
+                () -> new MarketPlaceNotFoundException("Marketplace with this id doesn't exist")
         );
 
         List<Item> itemList = itemRepository.findAllByProductAndMarketplaceAndOrderByDateStartAsc(
@@ -100,7 +100,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     @Transactional
-    public List<ProductPriceDifferenceDto> checkPriceDynamicForOneItem(
+    public List<ProductPriceDifferenceDto> checkPriceDynamicForOneItem (
             Long productId, LocalDate dateStart, LocalDate dateEnd) {
 
         Product product = productRepository.findById(productId).orElseThrow(

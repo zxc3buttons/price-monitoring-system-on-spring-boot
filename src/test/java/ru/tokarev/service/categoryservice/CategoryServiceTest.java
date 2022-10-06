@@ -6,12 +6,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.tokarev.entity.Category;
+import ru.tokarev.entity.Marketplace;
+import ru.tokarev.exception.categoryexception.CategoryNotFoundException;
+import ru.tokarev.exception.marketplaceexception.MarketPlaceNotFoundException;
 import ru.tokarev.repository.CategoryRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
@@ -97,5 +101,33 @@ class CategoryServiceTest {
 
         //assert
         verify(categoryRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void givenNothing_whenFindCategory_ThrowNotFoundException() {
+        assertThrows(CategoryNotFoundException.class, () -> {
+            categoryService.getById(1L);
+        });
+    }
+
+    @Test
+    void givenNothing_whenFindAll_ThrowNotFoundException() {
+        assertThrows(CategoryNotFoundException.class, () -> {
+            categoryService.getAll();
+        });
+    }
+
+    @Test
+    void givenNothing_whenUpdateCategory_ThrowNotFoundException() {
+        assertThrows(CategoryNotFoundException.class, () -> {
+            categoryService.updateCategory(1L, new Category());
+        });
+    }
+
+    @Test
+    void givenNothing_whenDeleteCategory_ThrowNotFoundException() {
+        assertThrows(CategoryNotFoundException.class, () -> {
+            categoryService.deleteCategory(1L);
+        });
     }
 }

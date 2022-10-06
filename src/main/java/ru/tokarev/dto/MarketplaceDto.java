@@ -13,7 +13,7 @@ import javax.validation.constraints.Pattern;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryDto {
+public class MarketplaceDto {
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;

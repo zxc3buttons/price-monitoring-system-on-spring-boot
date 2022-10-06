@@ -1,5 +1,9 @@
 package ru.tokarev.controller;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +14,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.tokarev.dto.ApiErrorDto;
 import ru.tokarev.dto.RoleDto;
 import ru.tokarev.dto.userdto.SignupDto;
 import ru.tokarev.dto.userdto.UserDto;
 import ru.tokarev.entity.User;
 import ru.tokarev.service.userservice.UserService;
+
+import javax.validation.Valid;
 
 @Slf4j
 @RequestMapping(value = "/api")
@@ -32,13 +39,19 @@ public class RegistrationController {
     }
 
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> signup(@RequestBody SignupDto signupDto) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created",
+                    content = @Content(schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "401", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
+    public ResponseEntity<UserDto> signup(@Valid @RequestBody SignupDto signupDto) {
 
         log.info("POST request for /signup with data: username {}, firstName {}, lastName {}, email {}, password {}",
                 signupDto.getUsername(), signupDto.getFirstName(), signupDto.getLastName(),
                 signupDto.getEmail(), signupDto.getPassword());
 
-        User user = convertToUserEntity(signupDto);
+        User user = convertFromSignupDtoToUserEntity(signupDto);
         User createdUser = userService.createUser(user);
         UserDto createdUserDto = convertToUserDto(createdUser);
 
@@ -58,7 +71,7 @@ public class RegistrationController {
         return userDto;
     }
 
-    private User convertToUserEntity(UserDto userDto) {
-        return modelMapper.map(userDto, User.class);
+    private User convertFromSignupDtoToUserEntity(SignupDto signupDto) {
+        return modelMapper.map(signupDto, User.class);
     }
 }

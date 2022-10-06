@@ -1,5 +1,9 @@
 package ru.tokarev.controller;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,12 +11,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.tokarev.dto.ApiErrorDto;
 import ru.tokarev.dto.CategoryDto;
-import ru.tokarev.dto.ProductDto;
+import ru.tokarev.dto.productdto.CategoryForProductRequestDto;
+import ru.tokarev.dto.productdto.ProductDto;
 import ru.tokarev.entity.Product;
 import ru.tokarev.service.productservice.ProductService;
 import ru.tokarev.utils.MapperUtil;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -31,6 +38,14 @@ public class ProductController {
     }
 
     @GetMapping
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = ProductDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     public ResponseEntity<List<ProductDto>> getAll(
             @RequestParam(name = "category", required = false) String categoryName) {
 
@@ -42,13 +57,21 @@ public class ProductController {
         log.info("Response for GET request for /products with data {}", productDtoList);
         for (ProductDto productDto : productDtoList) {
             log.info("id {}, name {}, categoryId {}", productDto.getId(),
-                    productDto.getName(), productDto.getCategoryDto().getId());
+                    productDto.getName(), productDto.getCategoryForProductRequestDto().getId());
         }
 
         return new ResponseEntity<>(productDtoList, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = ProductDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     public ResponseEntity<ProductDto> getById(@PathVariable Long id) {
 
         log.info("GET request for /products/{} with data {}", id, id);
@@ -57,13 +80,21 @@ public class ProductController {
         ProductDto productDto = convertToProductDto(product);
 
         log.info("Response for GET request for /products/{} with data: id {}, name {}, categoryId {} ", id,
-                productDto.getId(), productDto.getName(), productDto.getCategoryDto().getId());
+                productDto.getId(), productDto.getName(), productDto.getCategoryForProductRequestDto().getId());
 
         return new ResponseEntity<>(productDto, HttpStatus.OK);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created",
+                    content = @Content(schema = @Schema(implementation = ProductDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "401", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
+    public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductDto productDto) {
 
         log.info("POST request for /products with data: name {}, categoryId {}",
                 productDto.getName(), productDto.getId());
@@ -79,11 +110,20 @@ public class ProductController {
     }
 
     @PostMapping(value = "/import", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProductDto>> createProducts(@RequestBody List<ProductDto> productDtoList) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created",
+                    content = @Content(schema = @Schema(implementation = ProductDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "401", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
+    public ResponseEntity<List<ProductDto>> createProducts(@Valid @RequestBody List<ProductDto> productDtoList) {
 
         log.info("POST request for /products/import with data {}", productDtoList);
         for (ProductDto productDto : productDtoList) {
-            log.info("name {}, categoryId {}", productDto.getName(), productDto.getCategoryDto().getId());
+            log.info("name {}, categoryId {}", productDto.getName(),
+                    productDto.getCategoryForProductRequestDto().getId());
         }
 
         List<Product> productList = MapperUtil.convertList(productDtoList, this::convertToProductEntity);
@@ -93,17 +133,27 @@ public class ProductController {
         log.info("Response for POST request for /products/import with data {}", createdProductDtoList);
         for (ProductDto productDto : createdProductDtoList) {
             log.info("id {}, name {}, categoryId {}",
-                    productDto.getId(), productDto.getName(), productDto.getCategoryDto().getId());
+                    productDto.getId(), productDto.getName(), productDto.getCategoryForProductRequestDto().getId());
         }
 
         return new ResponseEntity<>(createdProductDtoList, HttpStatus.CREATED);
     }
 
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created",
+                    content = @Content(schema = @Schema(implementation = ProductDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "401", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDto productDto) {
 
         log.info("PATCH request for /products/{} with data: name {}, categoryId {}",
-                id, productDto.getName(), productDto.getCategoryDto().getId());
+                id, productDto.getName(), productDto.getCategoryForProductRequestDto().getId());
 
         Product product = convertToProductEntity(productDto);
         Product updatedProduct = productService.updateProduct(id, product);
@@ -111,12 +161,20 @@ public class ProductController {
 
         log.info("Response for PATCH request for /products/{} with data: id {}, name {}, categoryId {}",
                 id, updatedProductDto.getId(), updatedProductDto.getName(),
-                updatedProductDto.getCategoryDto().getId());
+                updatedProductDto.getCategoryForProductRequestDto().getId());
 
         return new ResponseEntity<>(updatedProductDto, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = ProductDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
+    })
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
 
         log.info("DELETE request for /products/{} with data {}", id, id);
@@ -129,9 +187,10 @@ public class ProductController {
     }
 
     private ProductDto convertToProductDto(Product product) {
-        CategoryDto categoryDto = modelMapper.map(product.getCategory(), CategoryDto.class);
+        CategoryForProductRequestDto categoryForProductRequestDto
+                = modelMapper.map(product.getCategory(), CategoryForProductRequestDto.class);
         ProductDto productDto = modelMapper.map(product, ProductDto.class);
-        productDto.setCategoryDto(categoryDto);
+        productDto.setCategoryForProductRequestDto(categoryForProductRequestDto);
 
         return productDto;
     }

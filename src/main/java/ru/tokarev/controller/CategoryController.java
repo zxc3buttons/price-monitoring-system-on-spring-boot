@@ -13,12 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.tokarev.dto.ApiErrorDto;
 import ru.tokarev.dto.CategoryDto;
-import ru.tokarev.dto.userdto.LoginResponseDto;
 import ru.tokarev.entity.Category;
-import ru.tokarev.exception.categoryexception.CategoryNotFoundException;
 import ru.tokarev.service.categoryservice.CategoryService;
 import ru.tokarev.utils.MapperUtil;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -75,6 +74,7 @@ public class CategoryController {
         return new ResponseEntity<>(categoryDto, HttpStatus.OK);
     }
 
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created",
                     content = @Content(schema = @Schema(implementation = CategoryDto.class))),
@@ -85,8 +85,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "401", description = "Bad request",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto categoryDto) {
+    public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryDto categoryDto) {
 
         log.info("POST request /categories with data {}", categoryDto.getName());
 
@@ -112,7 +111,7 @@ public class CategoryController {
     })
     @PostMapping(value = "/import", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<CategoryDto>> createCategories(
-            @RequestBody List<CategoryDto> categoryDtoList) {
+            @Valid @RequestBody List<CategoryDto> categoryDtoList) {
 
         log.info("POST request /categories/import with data {}", categoryDtoList);
         for (CategoryDto categoryDto : categoryDtoList) {
@@ -143,7 +142,8 @@ public class CategoryController {
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long id, @RequestBody CategoryDto categoryDto) {
+    public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long id, @Valid
+    @RequestBody CategoryDto categoryDto) {
 
         log.info("PATCH request /categories/{} with data {}", id, categoryDto.getName());
 
@@ -156,6 +156,7 @@ public class CategoryController {
         return new ResponseEntity<>(updatedCategoryDto, HttpStatus.OK);
     }
 
+    @DeleteMapping(value = "/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(schema = @Schema(implementation = CategoryDto.class))),
@@ -164,7 +165,6 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorDto.class)))
     })
-    @DeleteMapping(value = "/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
 
         log.info("DELETE request /categories/{} with data {}", id, id);

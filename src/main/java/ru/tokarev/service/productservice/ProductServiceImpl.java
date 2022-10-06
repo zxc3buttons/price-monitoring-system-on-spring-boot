@@ -36,13 +36,9 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public Product getById(Long id) {
 
-        Product product = productRepository.findById(id).orElseThrow(
+        return productRepository.findById(id).orElseThrow(
                 () -> new ProductNotFoundException("Product with this id not found")
         );
-
-        product.setCategory((Category) Hibernate.unproxy(product.getCategory()));
-
-        return product;
     }
 
     @Override
@@ -60,10 +56,6 @@ public class ProductServiceImpl implements ProductService {
                 throw new ProductNotFoundException("Products not found");
             }
 
-            for (Product product : productList) {
-                product.setCategory((Category) Hibernate.unproxy(product.getCategory()));
-            }
-
             return productList;
 
         } else {
@@ -79,10 +71,6 @@ public class ProductServiceImpl implements ProductService {
                 throw new ProductNotFoundException("Products not found");
             }
 
-            for (Product product : productList) {
-                product.setCategory((Category) Hibernate.unproxy(product.getCategory()));
-            }
-
             return productList;
         }
     }
@@ -91,20 +79,12 @@ public class ProductServiceImpl implements ProductService {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     @Transactional
     public Product createProduct(Product product) {
+
         if (productRepository.findByName(product.getName()).isPresent()) {
             throw new ProductExistsException("Product with this name already exists");
-        } else if (product.getCategory() == null) {
-            throw new ProductBadRequestException("Category shouldn't be empty");
-        } else if (product.getId() != null) {
-            throw new ProductBadRequestException("Id field should be empty");
-        } else if (product.getName().isEmpty() || product.getName() == null) {
-            throw new ProductBadRequestException("Product name field shouldn't be empty");
-        } else if (product.getCategory().getId() == null && product.getCategory().getName() == null) {
-            throw new ProductBadRequestException("Category fields shouldn't be empty");
         } else if (product.getCategory().getId() != null) {
             Category category = categoryRepository.findById(product.getCategory().getId()).orElseThrow(
-                    () -> new CategoryNotFoundException("Category with this id doesn't exist")
-            );
+                    () -> new CategoryNotFoundException("Category with this id doesn't exist"));
             product.setCategory(category);
             return Optional.of(productRepository.save(product)).orElseThrow(
                     () -> new ProductBadRequestException("Bad request")
@@ -145,23 +125,16 @@ public class ProductServiceImpl implements ProductService {
         if (productRepository.findByName(product.getName()).isPresent()) {
             throw new ProductExistsException("Product with this name already exists");
         }
-        if (product.getName().isEmpty() || product.getName() == null) {
-            throw new ProductBadRequestException("Product name field shouldn't be empty");
-        } else if (product.getCategory() == null) {
-            throw new ProductBadRequestException("Category shouldn't be empty");
-        } else if (product.getCategory().getId() == null && product.getCategory().getName() == null) {
-            throw new ProductBadRequestException("Category fields shouldn't be empty");
-        } else if (product.getCategory().getId() != null) {
+
+        if (product.getCategory().getId() != null) {
             category = categoryRepository.findById(product.getCategory().getId()).orElseThrow(
-                    () -> new CategoryNotFoundException("Category with this id doesn't exist")
-            );
-            existingProduct.setCategory(category);
+                    () -> new CategoryNotFoundException("Category with this id doesn't exist"));
         } else {
             category = categoryRepository.findByName(product.getCategory().getName()).orElseThrow(
                     () -> new CategoryNotFoundException("Category with this name doesn't exist")
             );
-            existingProduct.setCategory(category);
         }
+        existingProduct.setCategory(category);
 
         existingProduct.setName(product.getName());
 

@@ -245,7 +245,7 @@ public class ControllerAdviser extends ResponseEntityExceptionHandler {
         }
 
         ApiErrorDto apiErrorDto =
-                new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getLocalizedMessage(), errors,
+                new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors,
                         request.getContextPath(),
                         new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
 

@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.tokarev.entity.Role;
 import ru.tokarev.entity.User;
+import ru.tokarev.exception.userexception.UserNotFoundException;
 import ru.tokarev.repository.RoleRepository;
 import ru.tokarev.repository.UserRepository;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
@@ -144,5 +146,19 @@ class UserServiceTest {
 
         //assert
         verify(userRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void givenNull_whenFindUser_ThrowNotFoundException() {
+        assertThrows(UserNotFoundException.class, () -> {
+            userService.getById(1L);
+        });
+    }
+
+    @Test
+    void givenNull_whenFindAll_ThrowNotFoundException() {
+        assertThrows(UserNotFoundException.class, () -> {
+            userService.getAll();
+        });
     }
 }

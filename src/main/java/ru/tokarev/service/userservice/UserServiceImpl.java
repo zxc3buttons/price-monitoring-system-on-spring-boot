@@ -31,17 +31,14 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final Validator validator;
-
     private final Long ROLE_UNDEFINED = 103L;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder, Validator validator) {
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-        this.validator = validator;
     }
 
     @Override
@@ -58,7 +55,7 @@ public class UserServiceImpl implements UserService {
                 () -> new UserNotFoundException("Users not found"));
 
         if (userList.size() == 0) {
-            throw new UsernameNotFoundException("Users not found");
+            throw new UserNotFoundException("Users not found");
         }
 
         return userList;
@@ -67,17 +64,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User createUser(User user) {
-
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
-
-        if (!violations.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<User> constraintViolation : violations) {
-                sb.append(constraintViolation.getMessage());
-            }
-            throw new ConstraintViolationException("Error occurred: " + sb, violations);
-        }
-
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 

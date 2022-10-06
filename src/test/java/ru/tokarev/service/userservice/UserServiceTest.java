@@ -8,6 +8,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.tokarev.entity.Role;
 import ru.tokarev.entity.User;
+import ru.tokarev.exception.userexception.UserBadRequestException;
+import ru.tokarev.exception.userexception.UserExistsException;
 import ru.tokarev.exception.userexception.UserNotFoundException;
 import ru.tokarev.repository.RoleRepository;
 import ru.tokarev.repository.UserRepository;
@@ -149,16 +151,38 @@ class UserServiceTest {
     }
 
     @Test
-    void givenNull_whenFindUser_ThrowNotFoundException() {
+    void givenNothing_whenFindUser_ThrowNotFoundException() {
         assertThrows(UserNotFoundException.class, () -> {
             userService.getById(1L);
         });
     }
 
     @Test
-    void givenNull_whenFindAll_ThrowNotFoundException() {
+    void givenNothing_whenFindAll_ThrowNotFoundException() {
         assertThrows(UserNotFoundException.class, () -> {
             userService.getAll();
         });
     }
+
+    @Test
+    void givenNothing_whenUpdateUser_ThrowNotFoundException() {
+        assertThrows(UserNotFoundException.class, () -> {
+            userService.updateUser(1L, new User());
+        });
+    }
+
+    @Test
+    void givenNothing_whenUpdateUserRole_ThrowNotFoundException() {
+        assertThrows(UserNotFoundException.class, () -> {
+            userService.updateUserRole(1L, new User());
+        });
+    }
+
+    @Test
+    void givenNothing_whenDeleteUserRole_ThrowNotFoundException() {
+        assertThrows(UserNotFoundException.class, () -> {
+            userService.deleteUser(1L);
+        });
+    }
+
 }

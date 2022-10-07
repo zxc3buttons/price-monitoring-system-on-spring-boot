@@ -1,13 +1,3 @@
-CREATE
-DATABASE price_monitoring_system
-WITH
-OWNER = postgres
-ENCODING = 'UTF8'
-CONNECTION LIMIT = -1;
-
-\c
-price_monitoring_system;
-
 create sequence user_id_seq start with 100 increment by 1;
 create sequence role_id_seq start with 100 increment by 1;
 create sequence product_seq_id start with 100 increment by 1;
@@ -27,7 +17,7 @@ ALTER SEQUENCE role_id_seq OWNED BY role.id;
 ALTER TABLE IF EXISTS "role"
     OWNER to postgres;
 
-CREATE TABLE IF NOT EXISTS "users"
+CREATE TABLE "users"
 (
     id bigint NOT NULL DEFAULT nextval
 (
@@ -39,42 +29,29 @@ CREATE TABLE IF NOT EXISTS "users"
     email character varying COLLATE pg_catalog."default" NOT NULL,
     password character varying COLLATE pg_catalog."default" NOT NULL,
     created timestamp without time zone NOT NULL,
-    updated timestamp
-                      without time zone NOT NULL,
+    updated timestamp without time zone NOT NULL,
     role_id bigint not null,
-    PRIMARY KEY
-(
-    id
-),
-    CONSTRAINT user_role_id_fk FOREIGN KEY
-(
-    role_id
-)
-    REFERENCES role
-(
-    id
-) MATCH SIMPLE
+    PRIMARY KEY(id),
+    CONSTRAINT user_role_id_fk FOREIGN KEY(role_id)
+    REFERENCES role(id) MATCH SIMPLE
                       ON UPDATE NO ACTION
                       ON DELETE NO ACTION
     NOT VALID
-    );
+);
 
 ALTER SEQUENCE user_id_seq OWNED BY "users".id;
 ALTER TABLE IF EXISTS "users"
     OWNER to postgres;
 
-CREATE TABLE IF NOT EXISTS category
+CREATE TABLE category
 (
     id bigint NOT NULL DEFAULT nextval
 (
     'category_id_seq'
 ),
     name character varying COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT "Category_pkey" PRIMARY KEY
-(
-    id
-)
-    );
+    CONSTRAINT "Category_pkey" PRIMARY KEY(id)
+);
 
 ALTER SEQUENCE category_id_seq OWNED BY category.id;
 ALTER TABLE IF EXISTS category
@@ -132,17 +109,3 @@ create unique index item_serial_number_uindex
 
 create unique index item_product_id_date_start_marketplace_id_date_end_uindex
     on item (product_id, date_start, marketplace_id, date_end);
-
-INSERT INTO "role"
-values (101, 'ROLE_ADMIN');
-INSERT INTO "role"
-values (102, 'ROLE_USER');
-INSERT INTO "role"
-values (103, 'ROLE_UNDEFINED');
-
-INSERT INTO "users"
-values (1, 'oleg', 'Oleg', 'Tokarev', 'oleg@mail.ru', '$2a$12$jegcrhOb9pDtXdIGKpYB1ervHNx6yiXoNSIL0bBrhfEOVJhbXx31i',
-        current_timestamp, current_timestamp, 101);
-INSERT INTO "users"
-values (2, 'misha', 'Misha', 'Voronkov', 'misha@mail.ru',
-        '$2a$12$jegcrhOb9pDtXdIGKpYB1ervHNx6yiXoNSIL0bBrhfEOVJhbXx31i', current_timestamp, current_timestamp, 102);

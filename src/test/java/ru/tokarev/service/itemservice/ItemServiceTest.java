@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.tokarev.dto.item.PriceByDayDto;
 import ru.tokarev.dto.item.ProductPriceComparingDto;
 import ru.tokarev.dto.item.ProductPriceDifferenceDto;
@@ -35,7 +36,7 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class ItemServiceTest {
 
     @Mock
@@ -363,7 +364,7 @@ class ItemServiceTest {
 
     @Test
     void givenNothing_whenCheckPriceDynamicForOneItem_ThrowNotFoundException() {
-        assertThrows(ItemNotFoundException.class, () -> {
+        assertThrows(ProductNotFoundException.class, () -> {
             itemService.checkPriceDynamicForOneItem(null,  null, null);
         });
     }

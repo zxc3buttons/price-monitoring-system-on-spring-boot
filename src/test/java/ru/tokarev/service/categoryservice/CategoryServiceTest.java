@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.tokarev.entity.Category;
 import ru.tokarev.entity.Marketplace;
 import ru.tokarev.exception.categoryexception.CategoryNotFoundException;
@@ -21,7 +23,7 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class CategoryServiceTest {
 
     @Mock
@@ -93,7 +95,7 @@ class CategoryServiceTest {
     void deleteCategory() {
         //arrange
         Category existingCategory = new Category(1L, "drinks");
-        given(categoryRepository.findById(1L)).willReturn(Optional.of(existingCategory));
+        Mockito.when(categoryRepository.findById(1L)).thenReturn(Optional.of(existingCategory));
         willDoNothing().given(categoryRepository).deleteById(1L);
 
         //act

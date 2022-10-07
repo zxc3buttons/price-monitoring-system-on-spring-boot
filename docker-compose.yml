@@ -1,0 +1,30 @@
+version: '3.3'
+services:
+  app:
+    image: 'price-monitoring-system-on-spring-boot_app'
+    build:
+      context: .
+    container_name: price-monitoring-system-on-spring-boot_app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/price_monitoring_system
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 12345qwert
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  db:
+    image: 'price-monitoring-system-on-spring-boot_db'
+    build:
+      context: ./db
+    container_name: price-monitoring-system-on-spring-boot_db
+    volumes:
+      - ./var/pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=12345qwert
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=price_monitoring_system
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"

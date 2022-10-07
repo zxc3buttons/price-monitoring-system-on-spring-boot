@@ -1,13 +1,3 @@
-CREATE
-DATABASE price_monitoring_system
-WITH
-OWNER = postgres
-ENCODING = 'UTF8'
-CONNECTION LIMIT = -1;
-
-\c
-price_monitoring_system;
-
 create sequence user_id_seq start with 100 increment by 1;
 create sequence role_id_seq start with 100 increment by 1;
 create sequence product_seq_id start with 100 increment by 1;
@@ -27,54 +17,41 @@ ALTER SEQUENCE role_id_seq OWNED BY role.id;
 ALTER TABLE IF EXISTS "role"
     OWNER to postgres;
 
-CREATE TABLE IF NOT EXISTS "users"
+CREATE TABLE "users"
 (
     id bigint NOT NULL DEFAULT nextval
-(
-    'user_id_seq'
-),
+        (
+            'user_id_seq'
+        ),
     username character varying COLLATE pg_catalog."default" NOT NULL,
     first_name character varying COLLATE pg_catalog."default" NOT NULL,
     last_name character varying COLLATE pg_catalog."default" NOT NULL,
     email character varying COLLATE pg_catalog."default" NOT NULL,
     password character varying COLLATE pg_catalog."default" NOT NULL,
     created timestamp without time zone NOT NULL,
-    updated timestamp
-                      without time zone NOT NULL,
+    updated timestamp without time zone NOT NULL,
     role_id bigint not null,
-    PRIMARY KEY
-(
-    id
-),
-    CONSTRAINT user_role_id_fk FOREIGN KEY
-(
-    role_id
-)
-    REFERENCES role
-(
-    id
-) MATCH SIMPLE
-                      ON UPDATE NO ACTION
-                      ON DELETE NO ACTION
-    NOT VALID
-    );
+    PRIMARY KEY(id),
+    CONSTRAINT user_role_id_fk FOREIGN KEY(role_id)
+        REFERENCES role(id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+);
 
 ALTER SEQUENCE user_id_seq OWNED BY "users".id;
 ALTER TABLE IF EXISTS "users"
     OWNER to postgres;
 
-CREATE TABLE IF NOT EXISTS category
+CREATE TABLE category
 (
     id bigint NOT NULL DEFAULT nextval
-(
-    'category_id_seq'
-),
+        (
+            'category_id_seq'
+        ),
     name character varying COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT "Category_pkey" PRIMARY KEY
-(
-    id
-)
-    );
+    CONSTRAINT "Category_pkey" PRIMARY KEY(id)
+);
 
 ALTER SEQUENCE category_id_seq OWNED BY category.id;
 ALTER TABLE IF EXISTS category

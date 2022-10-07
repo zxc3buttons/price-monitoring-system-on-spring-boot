@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
                 () -> new UserNotFoundException("Users not found"));
 
         if (userList.size() == 0) {
-            throw new UsernameNotFoundException("Users not found");
+            throw new UserNotFoundException("Users not found");
         }
 
         return userList;

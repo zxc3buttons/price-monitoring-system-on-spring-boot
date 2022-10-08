@@ -2,9 +2,22 @@
 
 ## Setting Up Development Environment
 
-You need Docker:
+**For installing app you need _Maven_, _Docker_:**
 
-1) `git clone git@github.com:zxc3buttons/price-monitoring-system.git` in your work folder
+**Steps for run:**
 
+**Let's clone repo into your workspace:**
 
-2) run `docker compose up` in work folder
+1) `git clone git@github.com:zxc3buttons/price-monitoring-system-on-spring-boot.git` 
+
+**In your work folder run cmd and do:**
+
+2) `mvn clean`
+
+3) `mvn package`
+
+4) `docker image build .`
+
+5) `docker image build ./db`
+
+6) `docker compose up` in your work folder

@@ -1,5 +1,17 @@
 # PRICE-MONITORING-SYSTEM
 
+**This _PRESTful_ _MVC_ web-application on _Java 11_ uses the following technologies**:
+
+- **_Spring Boot_**, 
+- **_Spring Data_**, 
+- **_Spring Security_**,
+- **_Hibernate_**
+- **_Maven_**
+- **_JUnit 5_**, **_Mockito_**
+- **_Docker_**
+- **_Swagger Open API_**
+- **_Slf4j-log4j12_**
+
 ## Setting Up Development Environment
 
 **For installing app you need _Maven_, _Docker_:**

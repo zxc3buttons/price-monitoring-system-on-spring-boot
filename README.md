@@ -22,8 +22,6 @@
 - **_Tracking products price dynamics for certain period_**
 - **_Product price comparison_**
 
-Check web-application API on http://localhost:8080/swagger-ui/index.html#/
-
 ## Setting Up Development Environment
 
 **For installing app you need _Maven_, _Docker_:**
@@ -45,3 +43,5 @@ Check web-application API on http://localhost:8080/swagger-ui/index.html#/
 5) `docker image build ./db`
 
 6) `docker compose up` in your work folder
+
+Check web-application API on http://localhost:8080/swagger-ui/index.html#/

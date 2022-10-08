@@ -22,7 +22,7 @@
 - **_Tracking products price dynamics for certain period_**
 - **_Product price comparison_**
 
-## Setting Up Development Environment
+## Setting Up Development Environment:
 
 **For installing app you need _Maven_, _Docker_:**
 

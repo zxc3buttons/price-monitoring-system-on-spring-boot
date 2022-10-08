@@ -1,6 +1,6 @@
 # PRICE-MONITORING-SYSTEM
 
-**This _PRESTful_ _MVC_ web-application on _Java 11_ uses the following technologies**:
+## **This _PRESTful_ _MVC_ web-application on _Java 11_ uses the following technologies**:
 
 - **_Spring Boot_**, 
 - **_Spring Data_**, 
@@ -11,6 +11,18 @@
 - **_Docker_**
 - **_Swagger Open API_**
 - **_Slf4j-log4j12_**
+
+## Possibilities of application:
+
+- **_Users registration_**
+- **_Users authorization, authentication with Spring Security_**
+- **_Categories of products directory management_**
+- **_Marketplaces directory management_**
+- **_Sorting and search of products by category_**
+- **_Tracking products price dynamics for certain period_**
+- **_Product price comparison_**
+
+Check web-application API on http://localhost:8080/swagger-ui/index.html#/
 
 ## Setting Up Development Environment
 

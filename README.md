@@ -1,29 +1,47 @@
 # PRICE-MONITORING-SYSTEM
 
-## Setting Up Development Environment
+## **This _PRESTful_ _MVC_ web-application on _Java 11_ uses the following technologies**:
 
-1) You need **Java 11+** and set *JAVA_HOME* variable to *path_to_java* and add to *PATH* environment variable *
-   %JAVA_HOME%/bin*
+- **_Spring Boot_**, 
+- **_Spring Data_**, 
+- **_Spring Security_**,
+- **_Hibernate_**
+- **_Maven_**
+- **_JUnit 5_**, **_Mockito_**
+- **_Docker_**
+- **_Swagger Open API_**
+- **_Slf4j-log4j12_**
 
+## Possibilities of application:
 
-2) You need **PostgreSQL 14** and add to *PATH* environment variable *path_to_postgreSQL_folder/14/bin*
+- **_Users registration_**
+- **_Users authorization, authentication with Spring Security_**
+- **_Categories of products directory management_**
+- **_Marketplaces directory management_**
+- **_Sorting and search of products by category_**
+- **_Tracking products price dynamics for certain period_**
+- **_Product price comparison_**
 
+## Setting Up Development Environment:
 
-3) You need **Apache-Tomcat 9.x+** version and set *CATALINA_HOME* environment variable *path_to_tomcat_folder*
-   and add to *PATH* environment variable *%CATALINA_HOME%\bin*
+**For installing app you need _Maven_, _Docker_:**
 
+**Steps for run:**
 
-4) You need **Maven** latest version and set *M2_HOME* variable to *path_to_maven* and add to **PATH environment
-   variable *%M2_HOME%\bin*
+**Let's clone repo into your workspace:**
 
+1) `git clone git@github.com:zxc3buttons/price-monitoring-system-on-spring-boot.git` 
 
-5) `git clone git@github.com:zxc3buttons/price-monitoring-system.git` in your work folder
+**In your work folder run cmd and do:**
 
+2) `mvn clean`
 
-6) in *price_monitoring_system/db_init.bat* set *PG_PASSWORD* as your postgres superuser password
+3) `mvn package`
 
+4) `docker image build .`
 
-7) run *price_monitoring_system/db_init.bat*
+5) `docker image build ./db`
 
+6) `docker compose up` in your work folder
 
-8) run *price_monitoring_system/startup.bat*
+Check web-application API on http://localhost:8080/swagger-ui/index.html#/

@@ -15,7 +15,7 @@
 ## Possibilities of application:
 
 - **_Users registration_**
-- **_Users authorization, authentication with Spring Security_**
+- **_Users authorization, authentication by JWT-token mechanism with Spring Security_**
 - **_Categories of products directory management_**
 - **_Marketplaces directory management_**
 - **_Sorting and search of products by category_**

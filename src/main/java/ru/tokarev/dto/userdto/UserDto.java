@@ -24,11 +24,9 @@ public class UserDto {
     private String username;
 
     @NotBlank(message = "first name is mandatory")
-    @Pattern(regexp = "^[a-zA-Z]*$")
     private String firstName;
 
     @NotBlank(message = "last name is mandatory")
-    @Pattern(regexp = "^[a-zA-Z]*$")
     private String lastName;
 
     @NotBlank(message = "email is mandatory")

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 @Getter
 @Setter
@@ -19,6 +18,5 @@ public class CategoryDto {
     private Long id;
 
     @NotBlank(message = "name is mandatory")
-    @Pattern(regexp = "^[a-zA-Z]*$")
     private String name;
 }

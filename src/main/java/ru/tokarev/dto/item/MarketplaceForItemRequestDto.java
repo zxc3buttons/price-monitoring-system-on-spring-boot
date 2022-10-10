@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 @Getter
@@ -17,7 +18,7 @@ public class MarketplaceForItemRequestDto {
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
-    @Pattern(regexp = "^[a-zA-Z]*$")
+    @NotBlank(message = "name is mandatory")
     private String name;
 
 }

@@ -19,6 +19,5 @@ public class MarketplaceDto {
     private Long id;
 
     @NotBlank(message = "name is mandatory")
-    @Pattern(regexp = "^[a-zA-Z]*$")
     private String name;
 }

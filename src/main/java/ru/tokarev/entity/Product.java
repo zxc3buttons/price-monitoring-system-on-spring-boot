@@ -28,7 +28,6 @@ public class Product implements Serializable {
     @Column(name = "name")
 
     @NotBlank(message = "name is mandatory")
-    @Pattern(regexp = "^[a-zA-Z]*$")
     private String name;
 
     @JsonProperty("category")

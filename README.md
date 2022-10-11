@@ -12,6 +12,8 @@
 - **_Swagger Open API_**
 - **_Slf4j-log4j12_**
 
+**Problem N+1 resolved by using Spring Data possibilities**
+
 ## Possibilities of application:
 
 - **_Users registration_**

@@ -6,6 +6,7 @@
 - **_Spring Data_**, 
 - **_Spring Security_**,
 - **_Hibernate_**
+- **_PostgreSQL_**
 - **_Maven_**
 - **_JUnit 5_**, **_Mockito_**
 - **_Docker_**

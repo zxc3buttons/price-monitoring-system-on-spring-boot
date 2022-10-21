@@ -47,4 +47,4 @@
 
 6) `docker compose up` in your work folder
 
-Check web-application API on http://localhost:8080/swagger-ui/index.html#/
+Check web-application API on http://localhost:8080/swagger-ui/index.html#
